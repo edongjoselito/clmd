@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login - CLMD Region XI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+  body { min-height:100vh; background: linear-gradient(135deg,#0a3d62 0%, #1e6091 100%); display:flex; align-items:center; justify-content:center; }
+  .login-card { width: 100%; max-width: 420px; border:none; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+  .brand-bar { background:#f5b342; height: 6px; border-radius: 14px 14px 0 0; }
+  .login-header { padding: 24px 28px 0; }
+  .login-header h4 { color:#0a3d62; font-weight:700; margin:0; }
+  .login-header small { color:#6b7c93; }
+  .login-body { padding: 22px 28px 28px; }
+  .form-control:focus { border-color:#0a3d62; box-shadow: 0 0 0 .2rem rgba(10,61,98,.15); }
+  .btn-primary { background:#0a3d62; border-color:#0a3d62; }
+  .btn-primary:hover { background:#082c47; border-color:#082c47; }
+</style>
+</head>
+<body>
+<div class="card login-card">
+  <div class="brand-bar"></div>
+  <div class="login-header text-center">
+    <i class="bi bi-mortarboard-fill" style="font-size:2.5rem; color:#0a3d62;"></i>
+    <h4 class="mt-2">CLMD - DepEd Region XI</h4>
+    <small>Curriculum &amp; Learning Management Division</small>
+  </div>
+  <div class="login-body">
+    <?php if (!empty($error)): ?>
+      <div class="alert alert-danger py-2"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+    <form method="post" action="<?= site_url('login') ?>" autocomplete="off">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" required
+               value="<?= htmlspecialchars($username) ?>" autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">
+        <i class="bi bi-box-arrow-in-right"></i> Sign In
+      </button>
+    </form>
+    <div class="text-center mt-3 small text-muted">
+      &copy; <?= date('Y') ?> DepEd Region XI - CLMD
+    </div>
+  </div>
+</div>
+</body>
+</html>

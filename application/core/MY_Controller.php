@@ -1,0 +1,65 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+/**
+ * Base controller for CLMD - DepEd Region XI
+ *
+ * Provides:
+ *  - auth guard (redirect to /login if not signed in)
+ *  - role guard (regional | division)
+ *  - common layout rendering helper
+ */
+class MY_Controller extends CI_Controller
+{
+    /** @var array session-cached current user */
+    protected $current_user = null;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->current_user = $this->session->userdata('user');
+    }
+
+    /** Redirect to login if not authenticated. */
+    protected function require_login()
+    {
+        if (empty($this->current_user)) {
+            redirect('login');
+        }
+    }
+
+    /**
+     * Restrict access to a list of allowed roles.
+     * @param array $roles e.g. ['regional'] or ['regional','division']
+     */
+    protected function require_role(array $roles)
+    {
+        $this->require_login();
+        if (!in_array($this->current_user['role'], $roles, true)) {
+            show_error('You are not authorized to access this resource.', 403, 'Forbidden');
+        }
+    }
+
+    /**
+     * Render a page using the master layout.
+     */
+    protected function render($view, $data = [], $title = 'CLMD - DepEd Region XI')
+    {
+        $data['_title']   = $title;
+        $data['_user']    = $this->current_user;
+        $data['_content'] = $this->load->view($view, $data, TRUE);
+        $this->load->view('layouts/main', $data);
+    }
+
+    /** Persist an activity log row. */
+    protected function log_activity($action, $details = '')
+    {
+        $this->load->database();
+        $this->db->insert('activity_logs', [
+            'user_id'    => isset($this->current_user['user_id']) ? $this->current_user['user_id'] : null,
+            'action'     => $action,
+            'details'    => $details,
+            'ip_address' => $this->input->ip_address(),
+        ]);
+    }
+}
