@@ -85,6 +85,69 @@ class Document_model extends CI_Model
         return $out;
     }
 
+    /**
+     * Get the latest Approved Certification + Endorsement docs for a school.
+     * Returns ['certification' => row|null, 'endorsement' => row|null].
+     */
+    public function get_approved_pair($school_id)
+    {
+        $fetch = function ($type) use ($school_id) {
+            return $this->db->select('doc.*,
+                                      s.school_name, s.school_type, s.address AS school_address,
+                                      s.municipality,
+                                      d.name AS division_name, d.code AS division_code,
+                                      rev.full_name AS reviewed_by_name')
+                            ->from('documents doc')
+                            ->join('schools s',   's.school_id = doc.school_id', 'left')
+                            ->join('divisions d', 'd.division_id = doc.division_id', 'left')
+                            ->join('users rev',   'rev.user_id = doc.reviewed_by', 'left')
+                            ->where([
+                                'doc.school_id'     => $school_id,
+                                'doc.document_type' => $type,
+                                'doc.status'        => 'Approved',
+                            ])
+                            ->order_by('doc.approved_at', 'DESC')
+                            ->limit(1)
+                            ->get()->row_array();
+        };
+        return [
+            'certification' => $fetch(self::TYPE_CERTIFICATION),
+            'endorsement'   => $fetch(self::TYPE_ENDORSEMENT),
+        ];
+    }
+
+    /** True if a school has both required types Approved. */
+    public function pair_ready($school_id)
+    {
+        $pair = $this->get_approved_pair($school_id);
+        return !empty($pair['certification']) && !empty($pair['endorsement']);
+    }
+
+    /**
+     * For a list of documents, return a set of school_ids whose pair is ready.
+     * Avoids N+1 queries on the index view.
+     */
+    public function ready_school_ids(array $school_ids)
+    {
+        if (empty($school_ids)) return [];
+        $rows = $this->db->select('school_id, document_type')
+                         ->where_in('school_id', $school_ids)
+                         ->where('status', 'Approved')
+                         ->where_in('document_type', [self::TYPE_CERTIFICATION, self::TYPE_ENDORSEMENT])
+                         ->get($this->table)->result_array();
+        $map = [];
+        foreach ($rows as $r) {
+            $map[$r['school_id']][$r['document_type']] = true;
+        }
+        $ready = [];
+        foreach ($map as $sid => $types) {
+            if (!empty($types[self::TYPE_CERTIFICATION]) && !empty($types[self::TYPE_ENDORSEMENT])) {
+                $ready[(int)$sid] = true;
+            }
+        }
+        return $ready;
+    }
+
     public function next_control_no()
     {
         $year = date('Y');
