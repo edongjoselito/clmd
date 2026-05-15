@@ -53,11 +53,17 @@ $badges = ['For Approval'=>'warning','Approved'=>'success','Rejected'=>'danger',
         <i class="bi bi-clipboard-check"></i> Review
       </a>
     <?php endif; ?>
-    <?php if ($row['status'] === 'Approved'): ?>
+    <?php if (!empty($pair_ready)): ?>
       <a class="btn btn-success btn-sm" target="_blank"
-         href="<?= site_url('documents/certificate/'.$row['document_id']) ?>">
-        <i class="bi bi-printer"></i> Print Certification
+         href="<?= site_url('documents/certificate/'.$row['school_id']) ?>">
+        <i class="bi bi-printer"></i> Print Combined Certification
       </a>
+    <?php elseif ($row['status'] === 'Approved'): ?>
+      <span class="text-muted small ms-2">
+        <i class="bi bi-info-circle"></i>
+        Print available once <strong>both</strong> the Certification of Compliance to DepEd Order No. 54, s. 2022
+        and the Endorsement for this school are approved.
+      </span>
     <?php endif; ?>
   </div>
 </div>

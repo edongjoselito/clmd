@@ -36,10 +36,8 @@
             <?php
               $dt = set_value('document_type', $row['document_type'] ?? '');
               $types = [
-                'Certification of Compliance to DepEd Order No. 54',
+                'Certification of Compliance to DepEd Order No. 54, s. 2022',
                 'Endorsement',
-                'Certification',
-                'Other',
               ];
             ?>
             <option value="">— Select —</option>

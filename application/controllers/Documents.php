@@ -22,10 +22,17 @@ class Documents extends MY_Controller
             $filters['division_id'] = $div;
         }
 
+        $rows = $this->Document_model->all($filters);
+        $school_ids = array_values(array_unique(array_filter(array_map(function($r){
+            return (int)$r['school_id'];
+        }, $rows))));
+        $ready = $this->Document_model->ready_school_ids($school_ids);
+
         $this->render('documents/index', [
-            'rows'      => $this->Document_model->all($filters),
+            'rows'      => $rows,
             'divisions' => $this->Division_model->all(),
             'filters'   => $filters,
+            'ready'     => $ready,
         ], 'Documents');
     }
 
@@ -118,7 +125,10 @@ class Documents extends MY_Controller
             && (int)$row['division_id'] !== (int)$this->current_user['division_id']) {
             show_error('Forbidden', 403);
         }
-        $this->render('documents/view', ['row' => $row], 'View Document');
+        $this->render('documents/view', [
+            'row'         => $row,
+            'pair_ready'  => $this->Document_model->pair_ready($row['school_id']),
+        ], 'View Document');
     }
 
     public function review($id)
@@ -159,6 +169,18 @@ class Documents extends MY_Controller
                 site_url('documents/view/' . $id)
             );
 
+            // If this approval completes the pair, notify the submitter that
+            // the combined certification is now printable.
+            if ($action === 'approve' && $this->Document_model->pair_ready($row['school_id'])) {
+                $this->Notification_model->create(
+                    $row['submitted_by'],
+                    'Certification Ready to Print',
+                    sprintf('Both documents for %s are now Approved. You may print the combined Certification.',
+                            $row['school_name']),
+                    site_url('documents/certificate/' . $row['school_id'])
+                );
+            }
+
             $this->session->set_flashdata('success', 'Review saved.');
             redirect('documents');
         }
@@ -166,25 +188,41 @@ class Documents extends MY_Controller
         $this->render('documents/review', ['row' => $row], 'Review Document');
     }
 
-    /** Print certification page (only for Approved documents). */
-    public function certificate($id)
+    /**
+     * Print combined certification page for a school.
+     * Requires BOTH the Certification of Compliance (DO 54 s. 2022)
+     * and the Endorsement to be Approved.
+     */
+    public function certificate($school_id)
     {
-        $row = $this->Document_model->get($id);
-        if (!$row) show_404();
-        if ($row['status'] !== 'Approved') {
-            show_error('Certificate is available only after approval.', 403);
-        }
+        $school = $this->School_model->get($school_id);
+        if (!$school) show_404();
+
         if ($this->current_user['role'] === 'division'
-            && (int)$row['division_id'] !== (int)$this->current_user['division_id']) {
+            && (int)$school['division_id'] !== (int)$this->current_user['division_id']) {
             show_error('Forbidden', 403);
         }
 
-        $verify_url = site_url('verify/' . urlencode($row['control_no']));
+        $pair = $this->Document_model->get_approved_pair($school_id);
+        if (empty($pair['certification']) || empty($pair['endorsement'])) {
+            show_error(
+                'Printing is not yet allowed. Both the <strong>Certification of Compliance to '
+                .'DepEd Order No. 54, s. 2022</strong> and the <strong>Endorsement</strong> '
+                .'must be approved before a certification can be issued.',
+                403,
+                'Certification Not Yet Available'
+            );
+        }
+
+        // Use the Certification document's control_no as the package reference
+        $verify_url = site_url('verify/' . urlencode($pair['certification']['control_no']));
         $qr_url     = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='
                       . urlencode($verify_url);
 
         $this->load->view('documents/certificate', [
-            'row'        => $row,
+            'school'     => $pair['certification'], // contains joined school + division fields
+            'cert'       => $pair['certification'],
+            'endorse'    => $pair['endorsement'],
             'settings'   => $this->Setting_model->get(),
             'verify_url' => $verify_url,
             'qr_url'     => $qr_url,

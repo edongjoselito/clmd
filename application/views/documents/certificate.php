@@ -2,25 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Certification - <?= htmlspecialchars($row['control_no']) ?></title>
+<title>Certification - <?= htmlspecialchars($cert['control_no']) ?></title>
 <style>
-  @page { size: A4; margin: 20mm 20mm 22mm 20mm; }
+  @page { size: A4; margin: 18mm 18mm 20mm 18mm; }
   * { box-sizing: border-box; }
   body { font-family: 'Times New Roman', Times, serif; color:#222; margin:0; padding:0; background:#fff; }
-  .page { width: 210mm; min-height: 297mm; padding: 18mm 20mm; margin: 0 auto; background:#fff; position:relative; }
+  .page { width: 210mm; min-height: 297mm; padding: 16mm 18mm; margin: 0 auto; background:#fff; position:relative; }
   .letterhead { text-align:center; border-bottom: 2px solid #0a3d62; padding-bottom: 8px; }
   .letterhead .small-text { font-size: 12px; }
   .letterhead h2 { margin: 4px 0; color:#0a3d62; letter-spacing: 1px; }
-  .control-no { position: absolute; top: 18mm; right: 20mm; font-size: 11px; color:#555; }
-  .title { text-align:center; margin-top: 36px; letter-spacing: 4px; font-size: 22px; font-weight: bold; color:#0a3d62; }
-  .subtitle { text-align:center; font-style: italic; color:#555; margin-bottom: 28px; }
-  .body-text { font-size: 14px; line-height: 1.8; text-align: justify; padding: 0 12px; }
+  .control-no { position: absolute; top: 16mm; right: 18mm; font-size: 11px; color:#555; text-align:right; }
+  .title { text-align:center; margin-top: 32px; letter-spacing: 4px; font-size: 22px; font-weight: bold; color:#0a3d62; }
+  .subtitle { text-align:center; font-style: italic; color:#555; margin-bottom: 22px; }
+  .body-text { font-size: 13.5px; line-height: 1.75; text-align: justify; padding: 0 12px; }
   .body-text strong.school { text-transform: uppercase; }
-  .signatory { margin-top: 60px; text-align: center; }
-  .signatory .sigline { display: inline-block; min-width: 280px; border-bottom: 1px solid #222; padding-bottom: 4px; }
-  .signatory img.esig { max-height: 70px; display: block; margin: 0 auto -10px; }
+  .doc-list { margin: 14px 24px; font-size: 13.5px; }
+  .doc-list li { margin-bottom: 6px; }
+  .signatory { margin-top: 50px; text-align: center; }
+  .signatory .sigline { display: inline-block; min-width: 300px; border-bottom: 1px solid #222; padding-bottom: 4px; }
+  .signatory img.esig { max-height: 70px; display: block; margin: 0 auto -8px; }
   .signatory .name { font-weight: bold; text-transform: uppercase; }
-  .footer { position: absolute; bottom: 18mm; left: 20mm; right: 20mm;
+  .footer { position: absolute; bottom: 14mm; left: 18mm; right: 18mm;
             display: flex; justify-content: space-between; align-items: flex-end;
             font-size: 11px; color:#555; }
   .qr { text-align: center; }
@@ -39,7 +41,9 @@
 </div>
 
 <div class="page">
-  <div class="control-no">Control No.: <strong><?= htmlspecialchars($row['control_no']) ?></strong></div>
+  <div class="control-no">
+    Control No.:<br><strong><?= htmlspecialchars($cert['control_no']) ?></strong>
+  </div>
 
   <div class="letterhead">
     <div class="small-text">Republic of the Philippines</div>
@@ -52,23 +56,38 @@
   <div class="subtitle">TO WHOM IT MAY CONCERN:</div>
 
   <div class="body-text">
-    <p>This is to certify that <strong class="school"><?= htmlspecialchars($row['school_name']) ?></strong>,
-    a <?= strtolower($row['school_type']) ?> school
-    <?php if (!empty($row['municipality']) || !empty($row['school_address'])): ?>
-      located at <?= htmlspecialchars(trim(($row['school_address'] ?? '').' '.($row['municipality'] ?? ''), ', ')) ?>,
+    <p>This is to certify that <strong class="school"><?= htmlspecialchars($cert['school_name']) ?></strong>,
+    a <?= strtolower($cert['school_type']) ?> school
+    <?php if (!empty($cert['municipality']) || !empty($cert['school_address'])): ?>
+      located at <?= htmlspecialchars(trim(($cert['school_address'] ?? '').' '.($cert['municipality'] ?? ''), ', ')) ?>,
     <?php endif; ?>
-    under the supervision of the <?= htmlspecialchars($row['division_name']) ?>,
-    has submitted the document entitled
-    <em>"<?= htmlspecialchars($row['document_title']) ?>"</em>
-    (<?= htmlspecialchars($row['document_type']) ?>),
-    which has been duly <strong>reviewed and approved</strong> by the
-    Curriculum and Learning Management Division, DepEd Region XI on
-    <strong><?= date('F d, Y', strtotime($row['approved_at'] ?: $row['reviewed_at'])) ?></strong>.</p>
+    under the supervision of the <?= htmlspecialchars($cert['division_name']) ?>,
+    has been found <strong>compliant</strong> with
+    <strong>DepEd Order No. 54, s. 2022</strong>, based on the documents
+    submitted, reviewed, and duly approved by the Curriculum and Learning
+    Management Division, DepEd Region XI.</p>
 
-    <p>This Certification is being issued upon the request of the school for whatever purpose
-    it may serve.</p>
+    <p>The following documents form part of this certification:</p>
+    <ol class="doc-list">
+      <li>
+        <strong>Certification of Compliance to DepEd Order No. 54, s. 2022</strong>
+        &mdash; <em><?= htmlspecialchars($cert['document_title']) ?></em>
+        (Control No. <?= htmlspecialchars($cert['control_no']) ?>),
+        approved on <?= date('F d, Y', strtotime($cert['approved_at'] ?: $cert['reviewed_at'])) ?>.
+      </li>
+      <li>
+        <strong>Endorsement</strong>
+        &mdash; <em><?= htmlspecialchars($endorse['document_title']) ?></em>
+        (Control No. <?= htmlspecialchars($endorse['control_no']) ?>),
+        approved on <?= date('F d, Y', strtotime($endorse['approved_at'] ?: $endorse['reviewed_at'])) ?>.
+      </li>
+    </ol>
 
-    <p>Issued this <?= date('jS') ?> day of <?= date('F Y') ?> at DepEd Region XI, Davao City, Philippines.</p>
+    <p>This Certification is being issued upon the request of the school for
+    whatever legal purpose it may serve.</p>
+
+    <p>Issued this <?= date('jS') ?> day of <?= date('F Y') ?> at DepEd Region XI,
+    Davao City, Philippines.</p>
   </div>
 
   <div class="signatory">
@@ -85,7 +104,10 @@
     <div>
       <div><strong>Verify authenticity:</strong></div>
       <div class="verify-text"><?= htmlspecialchars($verify_url) ?></div>
-      <div class="verify-text">Document approved on <?= date('F d, Y H:i', strtotime($row['approved_at'] ?: $row['reviewed_at'])) ?></div>
+      <div class="verify-text">
+        Approved: Certification <?= date('M d, Y', strtotime($cert['approved_at'] ?: $cert['reviewed_at'])) ?>
+        &middot; Endorsement <?= date('M d, Y', strtotime($endorse['approved_at'] ?: $endorse['reviewed_at'])) ?>
+      </div>
     </div>
     <div class="qr">
       <img src="<?= htmlspecialchars($qr_url) ?>" alt="QR Code">
@@ -94,9 +116,5 @@
   </div>
 </div>
 
-<script>
-  // Auto-print after a slight delay (optional)
-  // window.addEventListener('load', () => setTimeout(()=>window.print(), 400));
-</script>
 </body>
 </html>

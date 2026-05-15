@@ -34,23 +34,44 @@
       <div><strong>Control No.:</strong> <?= htmlspecialchars($row['control_no']) ?></div>
       <div><strong>Status:</strong> <?= htmlspecialchars($row['status']) ?></div>
     </div>
-  <?php else: ?>
-    <div class="ok-banner"><i class="bi bi-patch-check-fill"></i> Authentic &amp; Approved Certification</div>
+  <?php else:
+    $cert_ok = !empty($pair['certification']);
+    $end_ok  = !empty($pair['endorsement']);
+    $both_ok = $cert_ok && $end_ok;
+  ?>
+    <?php if ($both_ok): ?>
+      <div class="ok-banner"><i class="bi bi-patch-check-fill"></i> Authentic Combined Certification</div>
+    <?php else: ?>
+      <div class="err-banner"><i class="bi bi-exclamation-triangle"></i>
+        This document is approved, but the combined certification is incomplete.</div>
+    <?php endif; ?>
     <div class="card-body">
       <dl class="row mb-0">
-        <dt class="col-sm-5">Control No.</dt>
-        <dd class="col-sm-7"><code><?= htmlspecialchars($row['control_no']) ?></code></dd>
-        <dt class="col-sm-5">Document Title</dt>
-        <dd class="col-sm-7"><?= htmlspecialchars($row['document_title']) ?></dd>
-        <dt class="col-sm-5">Document Type</dt>
-        <dd class="col-sm-7"><?= htmlspecialchars($row['document_type']) ?></dd>
         <dt class="col-sm-5">School</dt>
         <dd class="col-sm-7"><?= htmlspecialchars($row['school_name']) ?>
           (<?= htmlspecialchars($row['school_type']) ?>)</dd>
         <dt class="col-sm-5">Division</dt>
         <dd class="col-sm-7"><?= htmlspecialchars($row['division_name']) ?></dd>
-        <dt class="col-sm-5">Approved On</dt>
-        <dd class="col-sm-7"><?= date('F d, Y H:i', strtotime($row['approved_at'] ?: $row['reviewed_at'])) ?></dd>
+        <dt class="col-sm-5">Certification of Compliance<br><small class="text-muted">DO 54, s. 2022</small></dt>
+        <dd class="col-sm-7">
+          <?php if ($cert_ok): ?>
+            <span class="badge bg-success">Approved</span><br>
+            <code><?= htmlspecialchars($pair['certification']['control_no']) ?></code><br>
+            <small><?= date('F d, Y', strtotime($pair['certification']['approved_at'] ?: $pair['certification']['reviewed_at'])) ?></small>
+          <?php else: ?>
+            <span class="badge bg-secondary">Not approved</span>
+          <?php endif; ?>
+        </dd>
+        <dt class="col-sm-5">Endorsement</dt>
+        <dd class="col-sm-7">
+          <?php if ($end_ok): ?>
+            <span class="badge bg-success">Approved</span><br>
+            <code><?= htmlspecialchars($pair['endorsement']['control_no']) ?></code><br>
+            <small><?= date('F d, Y', strtotime($pair['endorsement']['approved_at'] ?: $pair['endorsement']['reviewed_at'])) ?></small>
+          <?php else: ?>
+            <span class="badge bg-secondary">Not approved</span>
+          <?php endif; ?>
+        </dd>
         <dt class="col-sm-5">Issued By</dt>
         <dd class="col-sm-7"><?= htmlspecialchars($settings['chief_name'] ?? 'CLMD Chief') ?>,
           <?= htmlspecialchars($settings['chief_position'] ?? '') ?></dd>

@@ -93,12 +93,19 @@ $badges = ['For Approval'=>'warning','Approved'=>'success','Rejected'=>'danger',
                  href="<?= site_url('documents/view/'.$r['document_id']) ?>" title="View">
                 <i class="bi bi-eye"></i>
               </a>
-              <?php if ($r['status'] === 'Approved'): ?>
+              <?php if (!empty($ready[(int)$r['school_id']])): ?>
                 <a class="btn btn-sm btn-outline-success"
                    target="_blank"
-                   href="<?= site_url('documents/certificate/'.$r['document_id']) ?>" title="Print Certification">
+                   href="<?= site_url('documents/certificate/'.$r['school_id']) ?>"
+                   title="Print Combined Certification (Cert + Endorsement both Approved)">
                   <i class="bi bi-printer"></i>
                 </a>
+              <?php elseif ($r['status'] === 'Approved'): ?>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        disabled
+                        title="Print available only when both the Certification and Endorsement for this school are Approved">
+                  <i class="bi bi-printer"></i>
+                </button>
               <?php endif; ?>
               <?php if ($_user['role'] === 'regional' && $r['status'] === 'For Approval'): ?>
                 <a class="btn btn-sm btn-outline-primary"

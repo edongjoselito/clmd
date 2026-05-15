@@ -14,9 +14,14 @@ class Verify extends CI_Controller
 
     public function index($control_no = null)
     {
-        $row = $control_no ? $this->Document_model->get_by_control_no($control_no) : null;
+        $row  = $control_no ? $this->Document_model->get_by_control_no($control_no) : null;
+        $pair = null;
+        if ($row) {
+            $pair = $this->Document_model->get_approved_pair($row['school_id']);
+        }
         $this->load->view('verify/index', [
             'row'        => $row,
+            'pair'       => $pair,
             'control_no' => $control_no,
             'settings'   => $this->Setting_model->get(),
         ]);
