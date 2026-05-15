@@ -18,6 +18,22 @@ class MY_Controller extends CI_Controller
     {
         parent::__construct();
         $this->current_user = $this->session->userdata('user');
+
+        // Validate session against DB; if the user was deleted or deactivated,
+        // force logout to avoid foreign-key errors and stale state.
+        if (!empty($this->current_user)) {
+            $row = $this->db->select('user_id, username, full_name, email, role, division_id, position, is_active')
+                            ->get_where('users', ['user_id' => $this->current_user['user_id']])
+                            ->row_array();
+            if (!$row || (int)$row['is_active'] !== 1) {
+                $this->session->sess_destroy();
+                $this->current_user = null;
+            } else {
+                // refresh cached user data
+                $this->current_user = $row;
+                $this->session->set_userdata('user', $row);
+            }
+        }
     }
 
     /** Redirect to login if not authenticated. */
@@ -45,9 +61,13 @@ class MY_Controller extends CI_Controller
      */
     protected function render($view, $data = [], $title = 'CLMD - DepEd Region XI')
     {
-        $data['_title']   = $title;
-        $data['_user']    = $this->current_user;
-        $data['_content'] = $this->load->view($view, $data, TRUE);
+        $this->load->model(['Notification_model','Setting_model']);
+        $data['_title']         = $title;
+        $data['_user']          = $this->current_user;
+        $data['_unread_count']  = $this->Notification_model->unread_count($this->current_user['user_id']);
+        $data['_recent_notifs'] = $this->Notification_model->recent($this->current_user['user_id'], 8);
+        $data['_settings']      = $this->Setting_model->get();
+        $data['_content']       = $this->load->view($view, $data, TRUE);
         $this->load->view('layouts/main', $data);
     }
 

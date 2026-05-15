@@ -1,11 +1,9 @@
-<?php
-$role = $_user['role'];
-?>
+<?php $role = $_user['role']; ?>
 <div class="row g-3 mb-3">
   <div class="col-md-3">
     <div class="card stat-card p-3">
-      <small class="text-muted">Pending Materials</small>
-      <div class="num text-warning"><?= (int)$counts['Pending'] ?></div>
+      <small class="text-muted">For Approval</small>
+      <div class="num text-warning"><?= (int)$counts['For Approval'] ?></div>
     </div>
   </div>
   <div class="col-md-3">
@@ -28,59 +26,64 @@ $role = $_user['role'];
   </div>
 </div>
 
-<?php if ($role === 'regional'): ?>
 <div class="row g-3 mb-3">
-  <div class="col-md-4">
-    <div class="card stat-card p-3">
-      <small class="text-muted">Total Users</small>
-      <div class="num"><?= (int)$total_users ?></div>
+  <?php if ($role === 'regional'): ?>
+    <div class="col-md-4">
+      <div class="card stat-card p-3"><small class="text-muted">Users</small>
+        <div class="num"><?= (int)$total_users ?></div></div>
     </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card stat-card p-3">
-      <small class="text-muted">Schools Divisions</small>
-      <div class="num"><?= (int)$total_divs ?></div>
+    <div class="col-md-4">
+      <div class="card stat-card p-3"><small class="text-muted">Divisions</small>
+        <div class="num"><?= (int)$total_divs ?></div></div>
     </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card stat-card p-3">
-      <small class="text-muted">Active Curriculum</small>
-      <div class="num"><?= (int)$total_curr ?></div>
+    <div class="col-md-4">
+      <div class="card stat-card p-3"><small class="text-muted">Schools (system-wide)</small>
+        <div class="num"><?= (int)$total_schools ?></div></div>
     </div>
-  </div>
+  <?php else: ?>
+    <div class="col-md-4">
+      <div class="card stat-card p-3"><small class="text-muted">Schools in your Division</small>
+        <div class="num"><?= (int)$total_schools ?></div></div>
+    </div>
+  <?php endif; ?>
 </div>
-<?php endif; ?>
 
 <div class="card">
-  <div class="card-header bg-white"><strong>Recent Submissions</strong></div>
+  <div class="card-header bg-white">
+    <strong><?= $role === 'regional' ? 'Pending Approvals' : 'Recent Submissions' ?></strong>
+  </div>
   <div class="table-responsive">
     <table class="table table-hover mb-0">
       <thead class="table-light">
         <tr>
-          <th>Title</th><th>Type</th><th>Grade / Subject</th>
+          <th>Title</th>
           <?php if ($role === 'regional'): ?><th>Division</th><?php endif; ?>
-          <th>Status</th><th>Submitted</th>
+          <th>School</th><th>Type</th><th>Status</th><th>Submitted</th><th></th>
         </tr>
       </thead>
       <tbody>
       <?php if (empty($recent_subs)): ?>
-        <tr><td colspan="6" class="text-center text-muted py-4">No submissions yet.</td></tr>
-      <?php else: foreach ($recent_subs as $r): ?>
+        <tr><td colspan="7" class="text-center text-muted py-4">No documents.</td></tr>
+      <?php else: foreach ($recent_subs as $r):
+        $b = ['For Approval'=>'warning','Approved'=>'success','Rejected'=>'danger','Revised'=>'primary'];
+      ?>
         <tr>
-          <td><?= htmlspecialchars($r['title']) ?></td>
-          <td><?= htmlspecialchars($r['type']) ?></td>
-          <td><?= htmlspecialchars($r['grade_level'] . ' / ' . $r['subject']) ?></td>
-          <?php if ($role === 'regional'): ?>
-            <td><?= htmlspecialchars($r['division_name'] ?? '—') ?></td>
-          <?php endif; ?>
-          <td>
-            <?php
-              $badge = ['Pending'=>'warning','Approved'=>'success','Rejected'=>'danger','Revised'=>'primary'];
-              $cls = $badge[$r['status']] ?? 'secondary';
-            ?>
-            <span class="badge bg-<?= $cls ?>"><?= htmlspecialchars($r['status']) ?></span>
+          <td><?= htmlspecialchars($r['document_title']) ?>
+            <div class="small text-muted"><?= htmlspecialchars($r['document_type']) ?></div>
           </td>
+          <?php if ($role === 'regional'): ?>
+            <td><?= htmlspecialchars($r['division_code'] ?? $r['division_name'] ?? '—') ?></td>
+          <?php endif; ?>
+          <td><?= htmlspecialchars($r['school_name'] ?? '—') ?></td>
+          <td><?= htmlspecialchars($r['school_type'] ?? '—') ?></td>
+          <td><span class="badge bg-<?= $b[$r['status']] ?? 'secondary' ?>">
+            <?= htmlspecialchars($r['status']) ?></span></td>
           <td><?= date('M d, Y', strtotime($r['created_at'])) ?></td>
+          <td>
+            <a class="btn btn-sm btn-outline-primary" href="<?= site_url('documents/view/'.$r['document_id']) ?>">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
         </tr>
       <?php endforeach; endif; ?>
       </tbody>

@@ -26,6 +26,11 @@
   .stat-card .num { font-size: 1.8rem; font-weight:700; }
   .badge-role-regional { background:#f5b342; color:#0a3d62; }
   .badge-role-division { background:#0a3d62; }
+  .notif-item { padding: 10px 14px; border-bottom: 1px solid #eef0f4; text-decoration:none; color:#222; display:block; }
+  .notif-item:hover { background:#f8fafc; }
+  .notif-item.unread { background: #fff8e7; }
+  .notif-item .small { color:#6b7c93; }
+  .dropdown-menu { min-width: 320px; }
 </style>
 </head>
 <body>
@@ -34,26 +39,34 @@
 <aside class="sidebar">
   <div class="brand">
     <h5>CLMD - Region XI</h5>
-    <small>Curriculum &amp; Learning Mgmt.</small>
+    <small>Document Submission System</small>
   </div>
   <nav class="nav flex-column mt-2">
     <a class="nav-link <?= $uri === 'dashboard' ? 'active':'' ?>" href="<?= site_url('dashboard') ?>">
       <i class="bi bi-speedometer2"></i> Dashboard
     </a>
-    <a class="nav-link <?= $uri === 'curriculum' ? 'active':'' ?>" href="<?= site_url('curriculum') ?>">
-      <i class="bi bi-journal-bookmark"></i> Curriculum
+    <a class="nav-link <?= $uri === 'documents' ? 'active':'' ?>" href="<?= site_url('documents') ?>">
+      <i class="bi bi-file-earmark-text"></i> Documents
     </a>
-    <a class="nav-link <?= $uri === 'learning-materials' || $uri === 'learning_materials' ? 'active':'' ?>"
-       href="<?= site_url('learning-materials') ?>">
-      <i class="bi bi-collection"></i> Learning Materials
+    <a class="nav-link <?= $uri === 'schools' ? 'active':'' ?>" href="<?= site_url('schools') ?>">
+      <i class="bi bi-building"></i> Schools
+    </a>
+    <a class="nav-link <?= $uri === 'notifications' ? 'active':'' ?>" href="<?= site_url('notifications') ?>">
+      <i class="bi bi-bell"></i> Notifications
+      <?php if ($_unread_count > 0): ?>
+        <span class="badge bg-danger ms-1"><?= $_unread_count ?></span>
+      <?php endif; ?>
     </a>
     <?php if ($role === 'regional'): ?>
       <hr class="text-white-50 my-2">
       <a class="nav-link <?= $uri === 'divisions' ? 'active':'' ?>" href="<?= site_url('divisions') ?>">
-        <i class="bi bi-building"></i> Divisions
+        <i class="bi bi-diagram-3"></i> Divisions
       </a>
       <a class="nav-link <?= $uri === 'users' ? 'active':'' ?>" href="<?= site_url('users') ?>">
         <i class="bi bi-people"></i> Users
+      </a>
+      <a class="nav-link <?= $uri === 'settings' ? 'active':'' ?>" href="<?= site_url('settings') ?>">
+        <i class="bi bi-gear"></i> Settings
       </a>
     <?php endif; ?>
     <hr class="text-white-50 my-2">
@@ -68,15 +81,40 @@
     <div>
       <strong><?= htmlspecialchars($_title) ?></strong>
     </div>
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-3">
+      <!-- Notifications -->
+      <div class="dropdown">
+        <button class="btn btn-light position-relative" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-bell"></i>
+          <?php if ($_unread_count > 0): ?>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              <?= $_unread_count ?>
+            </span>
+          <?php endif; ?>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end p-0">
+          <div class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+            <strong>Notifications</strong>
+            <a href="<?= site_url('notifications') ?>" class="small">View all</a>
+          </div>
+          <?php if (empty($_recent_notifs)): ?>
+            <div class="p-3 text-muted small">No notifications.</div>
+          <?php else: foreach ($_recent_notifs as $n): ?>
+            <a class="notif-item <?= $n['is_read'] ? '' : 'unread' ?>"
+               href="<?= site_url('notifications/read/'.$n['notif_id']) ?>">
+              <div><strong><?= htmlspecialchars($n['title']) ?></strong></div>
+              <div class="small"><?= htmlspecialchars($n['message']) ?></div>
+              <div class="small text-muted"><?= date('M d, Y H:i', strtotime($n['created_at'])) ?></div>
+            </a>
+          <?php endforeach; endif; ?>
+        </div>
+      </div>
+
       <span class="badge <?= $role === 'regional' ? 'badge-role-regional' : 'badge-role-division' ?>">
         <?= ucfirst($role) ?> User
       </span>
       <span class="text-muted small">
         <?= htmlspecialchars($_user['full_name']) ?>
-        <?php if (!empty($_user['division_name'] ?? null)): ?>
-          &middot; <?= htmlspecialchars($_user['division_name']) ?>
-        <?php endif; ?>
       </span>
     </div>
   </div>

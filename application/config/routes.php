@@ -58,8 +58,14 @@ $route['login']  = 'auth/login';
 $route['logout'] = 'auth/logout';
 
 // Resource shortcuts
-$route['dashboard']             = 'dashboard/index';
-$route['users']                 = 'users/index';
-$route['divisions']             = 'divisions/index';
-$route['curriculum']            = 'curriculum/index';
-$route['learning-materials']    = 'learning_materials/index';
+$route['dashboard']     = 'dashboard/index';
+$route['users']         = 'users/index';
+$route['divisions']     = 'divisions/index';
+$route['schools']       = 'schools/index';
+$route['documents']     = 'documents/index';
+$route['notifications'] = 'notifications/index';
+$route['settings']      = 'settings/index';
+
+// Public verify page (QR target): /verify/{control_no}
+$route['verify/(:any)'] = 'verify/index/$1';
+$route['verify']        = 'verify/index';
