@@ -3,11 +3,11 @@
 -- Document Submission & Approval System
 -- =====================================================================
 
-CREATE DATABASE IF NOT EXISTS `clmd_db`
+CREATE DATABASE IF NOT EXISTS `depedmis_clmd`
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE `clmd_db`;
+USE `depedmis_clmd`;
 
 -- ---------------------------------------------------------------------
 -- Divisions
@@ -72,8 +72,10 @@ CREATE TABLE `schools` (
   `school_code`   VARCHAR(40)  DEFAULT NULL,
   `school_name`   VARCHAR(255) NOT NULL,
   `school_type`   ENUM('Public','Private') NOT NULL DEFAULT 'Private',
-  `address`       VARCHAR(255) DEFAULT NULL,
-  `municipality`  VARCHAR(120) DEFAULT NULL,
+  `email`         VARCHAR(150) NOT NULL,
+  `province`      VARCHAR(120) NOT NULL,
+  `city`          VARCHAR(120) NOT NULL,
+  `barangay`      VARCHAR(120) NOT NULL,
   `division_id`   INT UNSIGNED NOT NULL,
   `is_active`     TINYINT(1)   NOT NULL DEFAULT 1,
   `created_by`    INT UNSIGNED DEFAULT NULL,

@@ -52,16 +52,23 @@ class Schools extends MY_Controller
 
         if ($this->input->method() === 'post') {
             $this->form_validation->set_rules('school_name', 'School Name', 'trim|required|max_length[255]');
-            $this->form_validation->set_rules('school_type', 'School Type', 'required|in_list[Public,Private]');
+            $this->form_validation->set_rules('school_code', 'School Code', 'trim|max_length[50]|alpha_numeric');
+            $this->form_validation->set_rules('school_type', 'School Type', 'trim|required|in_list[Public,Private]');
+            $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|max_length[100]');
+            $this->form_validation->set_rules('province', 'Province', 'trim|required|max_length[100]');
+            $this->form_validation->set_rules('city', 'City', 'trim|required|max_length[100]');
+            $this->form_validation->set_rules('barangay', 'Barangay', 'trim|required|max_length[100]');
 
             if ($this->form_validation->run() === TRUE) {
                 $payload = [
-                    'school_name'  => $this->input->post('school_name', TRUE),
-                    'school_code'  => $this->input->post('school_code', TRUE) ?: null,
-                    'school_type'  => $this->input->post('school_type', TRUE),
-                    'address'      => $this->input->post('address', TRUE) ?: null,
-                    'municipality' => $this->input->post('municipality', TRUE) ?: null,
-                    'is_active'    => $this->input->post('is_active') ? 1 : 0,
+                    'school_name' => $this->input->post('school_name', TRUE),
+                    'school_code' => $this->input->post('school_code', TRUE) ?: null,
+                    'school_type' => $this->input->post('school_type', TRUE),
+                    'email'       => $this->input->post('email', TRUE),
+                    'province'    => $this->input->post('province', TRUE),
+                    'city'        => $this->input->post('city', TRUE),
+                    'barangay'    => $this->input->post('barangay', TRUE),
+                    'is_active'   => $this->input->post('is_active') ? 1 : 0,
                 ];
                 if ($is_edit) {
                     $this->School_model->update($row['school_id'], $payload);

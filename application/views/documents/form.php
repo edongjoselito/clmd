@@ -16,6 +16,7 @@
     <?php endif; ?>
 
     <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">School *</label>
@@ -54,8 +55,8 @@
                  value="<?= htmlspecialchars(set_value('document_title', $row['document_title'] ?? '')) ?>">
         </div>
         <div class="col-12">
-          <label class="form-label">Upload File (PDF/DOC/JPG, max 50MB)</label>
-          <input type="file" name="file" class="form-control">
+          <label class="form-label">Upload File (PDF only, max 50MB)</label>
+          <input type="file" name="file" class="form-control" accept=".pdf,application/pdf">
           <?php if ($is_edit && !empty($row['file_path'])): ?>
             <small>Current: <a target="_blank" href="<?= base_url($row['file_path']) ?>">view file</a></small>
           <?php endif; ?>

@@ -25,6 +25,7 @@
 
     <hr>
     <form method="post">
+      <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
       <div class="mb-3">
         <label class="form-label">Review Notes</label>
         <textarea name="review_notes" class="form-control" rows="3"

@@ -3,11 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <title><?= htmlspecialchars($_title) ?></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 <style>
-  body { background:#f4f6fb; font-family: 'Segoe UI', Roboto, sans-serif; }
+  :root { --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+  body { background:#f4f6fb; font-family: var(--bs-body-font-family); color:#1e293b; }
   .sidebar {
     width: 250px; min-height: 100vh; background:#0a3d62; color:#fff; position:fixed; top:0; left:0;
   }
@@ -70,6 +79,9 @@
       </a>
     <?php endif; ?>
     <hr class="text-white-50 my-2">
+    <a class="nav-link <?= $uri === 'change_password' ? 'active':'' ?>" href="<?= site_url('change_password') ?>">
+      <i class="bi bi-shield-lock"></i> Change Password
+    </a>
     <a class="nav-link" href="<?= site_url('logout') ?>">
       <i class="bi bi-box-arrow-right"></i> Logout
     </a>
@@ -131,5 +143,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 </body>
 </html>

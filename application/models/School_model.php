@@ -25,7 +25,10 @@ class School_model extends CI_Model
             $this->db->group_start()
                      ->like('s.school_name', $filters['search'])
                      ->or_like('s.school_code', $filters['search'])
-                     ->or_like('s.municipality', $filters['search'])
+                     ->or_like('s.city', $filters['search'])
+                     ->or_like('s.barangay', $filters['search'])
+                     ->or_like('s.province', $filters['search'])
+                     ->or_like('s.email', $filters['search'])
                      ->group_end();
         }
         return $this->db->get()->result_array();

@@ -12,7 +12,8 @@ class Document_model extends CI_Model
     public function all($filters = [])
     {
         $this->db->select('doc.*,
-                           s.school_name, s.school_type, s.address AS school_address,
+                           s.school_name, s.school_type, s.email AS school_email,
+                           s.province, s.city, s.barangay,
                            d.name AS division_name, d.code AS division_code,
                            sub.full_name AS submitted_by_name,
                            rev.full_name AS reviewed_by_name')
@@ -42,8 +43,8 @@ class Document_model extends CI_Model
     public function get($id)
     {
         return $this->db->select('doc.*,
-                                  s.school_name, s.school_type, s.address AS school_address,
-                                  s.municipality,
+                                  s.school_name, s.school_type, s.email AS school_email,
+                                  s.province, s.city, s.barangay,
                                   d.name AS division_name, d.code AS division_code,
                                   sub.full_name AS submitted_by_name,
                                   rev.full_name AS reviewed_by_name')
@@ -93,8 +94,8 @@ class Document_model extends CI_Model
     {
         $fetch = function ($type) use ($school_id) {
             return $this->db->select('doc.*,
-                                      s.school_name, s.school_type, s.address AS school_address,
-                                      s.municipality,
+                                      s.school_name, s.school_type, s.email AS school_email,
+                                      s.province, s.city, s.barangay,
                                       d.name AS division_name, d.code AS division_code,
                                       rev.full_name AS reviewed_by_name')
                             ->from('documents doc')

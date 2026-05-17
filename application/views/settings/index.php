@@ -2,6 +2,7 @@
   <div class="card-header bg-white"><strong>System Settings</strong></div>
   <div class="card-body">
     <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">CLMD Chief Name</label>

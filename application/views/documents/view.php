@@ -17,7 +17,16 @@ $badges = ['For Approval'=>'warning','Approved'=>'success','Rejected'=>'danger',
       <dd class="col-sm-9">
         <?= htmlspecialchars($row['school_name']) ?>
         <span class="badge <?= $row['school_type']==='Private'?'bg-info':'bg-secondary' ?>"><?= $row['school_type'] ?></span>
-        <div class="small text-muted"><?= htmlspecialchars(trim(($row['school_address'] ?? '').' '.($row['municipality'] ?? ''))) ?></div>
+        <?php
+          $addr_parts = array_filter([$row['barangay'] ?? '', $row['city'] ?? '', $row['province'] ?? '']);
+          $addr = $addr_parts ? implode(', ', $addr_parts) : '';
+        ?>
+        <div class="small text-muted">
+          <?= htmlspecialchars($addr) ?>
+          <?php if (!empty($row['school_email'])): ?>
+            &middot; <i class="bi bi-envelope"></i> <?= htmlspecialchars($row['school_email']) ?>
+          <?php endif; ?>
+        </div>
       </dd>
       <dt class="col-sm-3">Division</dt><dd class="col-sm-9"><?= htmlspecialchars($row['division_name'] ?? '—') ?></dd>
       <dt class="col-sm-3">Submitted by</dt>

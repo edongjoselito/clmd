@@ -36,11 +36,14 @@ class Users extends MY_Controller
         $is_edit = !empty($user);
 
         if ($this->input->method() === 'post') {
-            $this->form_validation->set_rules('username', 'Username', 'trim|required|max_length[50]');
-            $this->form_validation->set_rules('full_name', 'Full Name', 'trim|required|max_length[150]');
-            $this->form_validation->set_rules('role', 'Role', 'required|in_list[regional,division]');
+            $this->form_validation->set_rules('username', 'Username', 'trim|required|alpha_numeric|min_length[3]|max_length[50]|callback_username_check');
+            $this->form_validation->set_rules('full_name', 'Full Name', 'trim|required|max_length[100]');
+            $this->form_validation->set_rules('email', 'Email', 'trim|valid_email|max_length[100]');
+            $this->form_validation->set_rules('position', 'Position', 'trim|max_length[100]');
+            $this->form_validation->set_rules('role', 'Role', 'trim|required|in_list[regional,division]');
+            $this->form_validation->set_rules('division_id', 'Division', 'integer');
             if (!$is_edit) {
-                $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
+                $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[8]');
             }
 
             if ($this->form_validation->run() === TRUE) {

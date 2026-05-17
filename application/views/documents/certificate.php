@@ -58,8 +58,12 @@
   <div class="body-text">
     <p>This is to certify that <strong class="school"><?= htmlspecialchars($cert['school_name']) ?></strong>,
     a <?= strtolower($cert['school_type']) ?> school
-    <?php if (!empty($cert['municipality']) || !empty($cert['school_address'])): ?>
-      located at <?= htmlspecialchars(trim(($cert['school_address'] ?? '').' '.($cert['municipality'] ?? ''), ', ')) ?>,
+    <?php
+      $addr_parts = array_filter([$cert['barangay'] ?? '', $cert['city'] ?? '', $cert['province'] ?? '']);
+      $addr = $addr_parts ? implode(', ', $addr_parts) : '';
+    ?>
+    <?php if ($addr !== ''): ?>
+      located at <?= htmlspecialchars($addr) ?>,
     <?php endif; ?>
     under the supervision of the <?= htmlspecialchars($cert['division_name']) ?>,
     has been found <strong>compliant</strong> with

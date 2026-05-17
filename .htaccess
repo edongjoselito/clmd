@@ -1,0 +1,21 @@
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect configuration files
+<FilesMatch "\.(ini|log|sql|json)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Prevent access to application and system directories
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/(application|system|uploads)/
+    RewriteRule ^(.*)$ - [F,L]
+</IfModule>

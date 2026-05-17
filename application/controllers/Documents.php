@@ -252,9 +252,10 @@ class Documents extends MY_Controller
 
         $config = [
             'upload_path'   => $upload_dir,
-            'allowed_types' => 'pdf|doc|docx|jpg|jpeg|png',
+            'allowed_types' => 'pdf',
             'max_size'      => 51200,
             'encrypt_name'  => TRUE,
+            'file_ext_tolower' => TRUE,
         ];
         $this->load->library('upload', $config);
 

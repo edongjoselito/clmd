@@ -4,6 +4,7 @@
     <?= validation_errors('<div class="alert alert-danger py-2">', '</div>') ?>
 
     <form method="post">
+      <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
       <div class="row g-3">
         <div class="col-md-8">
           <label class="form-label">School Name *</label>
@@ -23,15 +24,25 @@
             <option value="Public"  <?= $st === 'Public'  ? 'selected':'' ?>>Public</option>
           </select>
         </div>
-        <div class="col-md-8">
-          <label class="form-label">Address</label>
-          <input type="text" name="address" class="form-control"
-                 value="<?= htmlspecialchars(set_value('address', $row['address'] ?? '')) ?>">
-        </div>
         <div class="col-md-6">
-          <label class="form-label">Municipality / City</label>
-          <input type="text" name="municipality" class="form-control"
-                 value="<?= htmlspecialchars(set_value('municipality', $row['municipality'] ?? '')) ?>">
+          <label class="form-label">Email *</label>
+          <input type="email" name="email" class="form-control" required
+                 value="<?= htmlspecialchars(set_value('email', $row['email'] ?? '')) ?>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Province *</label>
+          <input type="text" name="province" class="form-control" required
+                 value="<?= htmlspecialchars(set_value('province', $row['province'] ?? '')) ?>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">City / Municipality *</label>
+          <input type="text" name="city" class="form-control" required
+                 value="<?= htmlspecialchars(set_value('city', $row['city'] ?? '')) ?>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Barangay *</label>
+          <input type="text" name="barangay" class="form-control" required
+                 value="<?= htmlspecialchars(set_value('barangay', $row['barangay'] ?? '')) ?>">
         </div>
         <div class="col-md-6 d-flex align-items-end">
           <div class="form-check">
