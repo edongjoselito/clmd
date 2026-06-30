@@ -18,9 +18,9 @@
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
       <div class="row g-3">
-        <div class="col-md-6">
+        <div class="col-12">
           <label class="form-label">School *</label>
-          <select name="school_id" class="form-select" required>
+          <select name="school_id" class="form-select select2" required style="width: 100%;">
             <option value="">— Select school —</option>
             <?php $sel = set_value('school_id', $row['school_id'] ?? ''); ?>
             <?php foreach ($schools as $s): ?>
@@ -31,45 +31,54 @@
             <?php endforeach; ?>
           </select>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">Document Type *</label>
-          <select name="document_type" class="form-select" required>
-            <?php
-              $dt = set_value('document_type', $row['document_type'] ?? '');
-              $types = [
-                'Certification of Compliance to DepEd Order No. 54, s. 2022',
-                'Endorsement',
-              ];
-            ?>
-            <option value="">— Select —</option>
-            <?php foreach ($types as $t): ?>
-              <option value="<?= htmlspecialchars($t) ?>" <?= $dt === $t ? 'selected':'' ?>>
-                <?= htmlspecialchars($t) ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
-        </div>
+      </div>
+
+      <hr>
+      <h5 class="mb-3">Certification of Compliance</h5>
+      <div class="row g-3 mb-4">
         <div class="col-12">
           <label class="form-label">Document Title *</label>
-          <input type="text" name="document_title" class="form-control" required
-                 value="<?= htmlspecialchars(set_value('document_title', $row['document_title'] ?? '')) ?>">
+          <input type="text" name="cert_title" class="form-control" required
+                 value="<?= htmlspecialchars(set_value('cert_title', $row['document_title'] ?? '')) ?>">
         </div>
         <div class="col-12">
-          <label class="form-label">Upload File (PDF only, max 50MB)</label>
-          <input type="file" name="file" class="form-control" accept=".pdf,application/pdf">
-          <?php if ($is_edit && !empty($row['file_path'])): ?>
+          <label class="form-label">Upload Certification File (PDF only, max 50MB) *</label>
+          <input type="file" name="cert_file" class="form-control" accept=".pdf,application/pdf" required>
+          <?php if ($is_edit && !empty($row['file_path']) && $row['document_type'] === 'Certification of Compliance to DepEd Order No. 54, s. 2022'): ?>
             <small>Current: <a target="_blank" href="<?= base_url($row['file_path']) ?>">view file</a></small>
           <?php endif; ?>
         </div>
         <div class="col-12">
           <label class="form-label">Remarks</label>
-          <textarea name="remarks" class="form-control" rows="3"><?= htmlspecialchars(set_value('remarks', $row['remarks'] ?? '')) ?></textarea>
+          <textarea name="cert_remarks" class="form-control" rows="2"><?= htmlspecialchars(set_value('cert_remarks', $row['remarks'] ?? '')) ?></textarea>
         </div>
       </div>
+
+      <hr>
+      <h5 class="mb-3">Endorsement</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <label class="form-label">Document Title *</label>
+          <input type="text" name="endorse_title" class="form-control" required
+                 value="<?= htmlspecialchars(set_value('endorse_title', '')) ?>">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Upload Endorsement File (PDF only, max 50MB) *</label>
+          <input type="file" name="endorse_file" class="form-control" accept=".pdf,application/pdf" required>
+          <?php if ($is_edit && !empty($row['file_path']) && $row['document_type'] === 'Endorsement'): ?>
+            <small>Current: <a target="_blank" href="<?= base_url($row['file_path']) ?>">view file</a></small>
+          <?php endif; ?>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Remarks</label>
+          <textarea name="endorse_remarks" class="form-control" rows="2"><?= htmlspecialchars(set_value('endorse_remarks', '')) ?></textarea>
+        </div>
+      </div>
+
       <hr>
       <a href="<?= site_url('documents') ?>" class="btn btn-light">Cancel</a>
       <button type="submit" class="btn btn-primary">
-        <i class="bi bi-cloud-upload"></i> Submit for Approval
+        <i class="bi bi-cloud-upload"></i> Submit Both Documents
       </button>
     </form>
   </div>

@@ -10,36 +10,79 @@
 <title><?= htmlspecialchars($_title) ?></title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 <style>
-  :root { --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-  body { background:#f4f6fb; font-family: var(--bs-body-font-family); color:#1e293b; }
+  :root {
+    --bs-body-font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    --maroon-primary: #0c2461;
+    --maroon-dark: #081a48;
+    --maroon-light: #1e3a8a;
+    --maroon-soft: #e8edf5;
+    --gold-accent: #d4af37;
+  }
+  body { background:#f8f9fa; font-family: var(--bs-body-font-family); color:#2d3748; }
   .sidebar {
-    width: 250px; min-height: 100vh; background:#0a3d62; color:#fff; position:fixed; top:0; left:0;
+    width: 260px; min-height: 100vh; background: linear-gradient(180deg, var(--maroon-primary) 0%, var(--maroon-dark) 100%);
+    color:#fff; position:fixed; top:0; left:0; box-shadow: 4px 0 12px rgba(0,0,0,.15);
   }
-  .sidebar .brand { padding: 18px 16px; border-bottom: 1px solid rgba(255,255,255,.1); }
-  .sidebar .brand h5 { margin:0; font-weight:700; }
-  .sidebar .brand small { color:#cfd8e3; }
-  .sidebar a.nav-link { color:#dbe7f3; padding: 10px 16px; border-left: 3px solid transparent; }
+  .sidebar .brand { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,.15); background: rgba(0,0,0,.1); }
+  .sidebar .brand h5 { margin:0; font-weight:700; letter-spacing: 0.5px; }
+  .sidebar .brand small { color:#e8d5d5; font-weight:500; }
+  .sidebar a.nav-link { color:#e8d5d5; padding: 12px 20px; border-left: 4px solid transparent; transition: all 0.2s ease; border-radius: 0 8px 8px 0; margin-right: 12px; }
   .sidebar a.nav-link:hover, .sidebar a.nav-link.active {
-    background: rgba(255,255,255,.08); color:#fff; border-left-color:#f5b342;
+    background: rgba(255,255,255,.12); color:#fff; border-left-color: var(--gold-accent);
   }
-  .sidebar a.nav-link i { width: 22px; }
-  .topbar { background:#fff; border-bottom:1px solid #e3e7ef; padding: 12px 24px; }
-  .main { margin-left: 250px; }
-  .content { padding: 24px; }
-  .card { border:none; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
-  .stat-card .num { font-size: 1.8rem; font-weight:700; }
-  .badge-role-regional { background:#f5b342; color:#0a3d62; }
-  .badge-role-division { background:#0a3d62; }
-  .notif-item { padding: 10px 14px; border-bottom: 1px solid #eef0f4; text-decoration:none; color:#222; display:block; }
-  .notif-item:hover { background:#f8fafc; }
-  .notif-item.unread { background: #fff8e7; }
-  .notif-item .small { color:#6b7c93; }
-  .dropdown-menu { min-width: 320px; }
+  .sidebar a.nav-link i { width: 24px; font-size: 1.1rem; }
+  .topbar { background:#fff; border-bottom:1px solid #e2e8f0; padding: 16px 28px; box-shadow: 0 2px 4px rgba(0,0,0,.03); }
+  .main { margin-left: 260px; }
+  .content { padding: 28px; }
+  .card { border:none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+  .stat-card { background: linear-gradient(135deg, #fff 0%, #fafafa 100%); border-left: 4px solid var(--maroon-primary); }
+  .stat-card .num { font-size: 2rem; font-weight:700; color: var(--maroon-primary); }
+  .stat-card small { font-weight:600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; }
+  .badge-role-regional { background: linear-gradient(135deg, var(--gold-accent) 0%, #c9a227 100%); color: var(--maroon-dark); padding: 6px 14px; border-radius: 20px; font-weight:600; }
+  .badge-role-division { background: linear-gradient(135deg, var(--maroon-primary) 0%, var(--maroon-dark) 100%); color:#fff; padding: 6px 14px; border-radius: 20px; font-weight:600; }
+  .notif-item { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; text-decoration:none; color:#333; display:block; transition: background 0.2s ease; }
+  .notif-item:hover { background:var(--maroon-soft); }
+  .notif-item.unread { background: linear-gradient(135deg, #fff8e7 0%, #fff3d6 100%); border-left: 3px solid var(--gold-accent); }
+  .notif-item .small { color:#718096; }
+  .dropdown-menu { min-width: 340px; border-radius: 12px; border:none; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+  .btn-light { background:#f8f9fa; border:1px solid #e2e8f0; transition: all 0.2s ease; }
+  .btn-light:hover { background:var(--maroon-soft); border-color: var(--maroon-light); }
+  .table { border-radius: 8px; overflow: hidden; }
+  .table thead th { background: linear-gradient(135deg, var(--maroon-primary) 0%, var(--maroon-light) 100%); color:#fff; font-weight:600; border:none; padding: 14px 16px; }
+  .table tbody tr { transition: background 0.2s ease; }
+  .table tbody tr:hover { background:var(--maroon-soft); }
+  .select2-container--default .select2-selection--single {
+    height: 38px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+  }
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 36px;
+    padding-left: 12px;
+    color: #2d3748;
+  }
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+  }
+  .select2-container--default .select2-results__option {
+    color: #2d3748;
+    padding: 8px 12px;
+  }
+  .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--maroon-primary);
+    color: #fff;
+  }
+  .select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: var(--maroon-soft);
+    color: #2d3748;
+  }
 </style>
 </head>
 <body>
@@ -48,7 +91,6 @@
 <aside class="sidebar">
   <div class="brand">
     <h5>CLMD - Region XI</h5>
-    <small>Document Submission System</small>
   </div>
   <nav class="nav flex-column mt-2">
     <a class="nav-link <?= $uri === 'dashboard' ? 'active':'' ?>" href="<?= site_url('dashboard') ?>">
@@ -144,7 +186,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('.select2').select2({
+      placeholder: '— Select school —',
+      allowClear: true,
+      width: '100%'
+    });
+  });
+</script>
 </body>
 </html>

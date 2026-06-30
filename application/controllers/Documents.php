@@ -58,8 +58,8 @@ class Documents extends MY_Controller
 
         if ($this->input->method() === 'post') {
             $this->form_validation->set_rules('school_id', 'School', 'required|integer');
-            $this->form_validation->set_rules('document_title', 'Document Title', 'trim|required|max_length[255]');
-            $this->form_validation->set_rules('document_type', 'Document Type', 'trim|required|max_length[120]');
+            $this->form_validation->set_rules('cert_title', 'Certification Title', 'trim|required|max_length[255]');
+            $this->form_validation->set_rules('endorse_title', 'Endorsement Title', 'trim|required|max_length[255]');
 
             if ($this->form_validation->run() === TRUE) {
                 $school = $this->School_model->get($this->input->post('school_id'));
@@ -68,17 +68,67 @@ class Documents extends MY_Controller
                     redirect(current_url());
                 }
 
-                $payload = [
-                    'school_id'      => $school['school_id'],
-                    'document_title' => $this->input->post('document_title', TRUE),
-                    'document_type'  => $this->input->post('document_type', TRUE),
-                    'remarks'        => $this->input->post('remarks', TRUE) ?: null,
-                ];
+                // Handle dual file upload for new submissions
+                if (!$is_edit) {
+                    $cert_fp = $this->_handle_upload('cert_file');
+                    $endorse_fp = $this->_handle_upload('endorse_file');
 
-                $fp = $this->_handle_upload();
-                if ($fp) $payload['file_path'] = $fp;
+                    if (!$cert_fp || !$endorse_fp) {
+                        $this->session->set_flashdata('error', 'Both files must be uploaded.');
+                        redirect(current_url());
+                    }
 
-                if ($is_edit) {
+                    // Insert Certification
+                    $cert_payload = [
+                        'school_id'      => $school['school_id'],
+                        'division_id'    => $this->current_user['division_id'],
+                        'submitted_by'   => $this->current_user['user_id'],
+                        'document_title' => $this->input->post('cert_title', TRUE),
+                        'document_type'  => 'Certification of Compliance to DepEd Order No. 54, s. 2022',
+                        'file_path'      => $cert_fp,
+                        'remarks'        => $this->input->post('cert_remarks', TRUE) ?: null,
+                        'status'         => 'For Approval',
+                    ];
+                    $cert_id = $this->Document_model->insert($cert_payload);
+                    $this->log_activity('document_submit', "Cert #$cert_id");
+
+                    // Insert Endorsement
+                    $endorse_payload = [
+                        'school_id'      => $school['school_id'],
+                        'division_id'    => $this->current_user['division_id'],
+                        'submitted_by'   => $this->current_user['user_id'],
+                        'document_title' => $this->input->post('endorse_title', TRUE),
+                        'document_type'  => 'Endorsement',
+                        'file_path'      => $endorse_fp,
+                        'remarks'        => $this->input->post('endorse_remarks', TRUE) ?: null,
+                        'status'         => 'For Approval',
+                    ];
+                    $endorse_id = $this->Document_model->insert($endorse_payload);
+                    $this->log_activity('document_submit', "Endorse #$endorse_id");
+
+                    // notify regional users
+                    $this->Notification_model->notify_regional(
+                        'New Documents for Approval',
+                        sprintf('%s submitted Certification & Endorsement for %s',
+                            $this->current_user['full_name'] ?? '',
+                            $school['school_name']
+                        ),
+                        site_url('documents')
+                    );
+
+                    $this->session->set_flashdata('success', 'Both documents submitted for approval.');
+                    redirect('documents');
+                } else {
+                    // Handle edit mode (single document)
+                    $payload = [
+                        'school_id'      => $school['school_id'],
+                        'document_title' => $this->input->post('cert_title', TRUE),
+                        'remarks'        => $this->input->post('cert_remarks', TRUE) ?: null,
+                    ];
+
+                    $fp = $this->_handle_upload('cert_file');
+                    if ($fp) $payload['file_path'] = $fp;
+
                     if ($row['status'] !== 'For Approval') {
                         $payload['status']       = 'For Approval';
                         $payload['review_notes'] = null;
@@ -86,27 +136,21 @@ class Documents extends MY_Controller
                     $this->Document_model->update($row['document_id'], $payload);
                     $doc_id = $row['document_id'];
                     $this->log_activity('document_update', "Doc #$doc_id");
-                } else {
-                    $payload['division_id']  = $this->current_user['division_id'];
-                    $payload['submitted_by'] = $this->current_user['user_id'];
-                    $payload['status']       = 'For Approval';
-                    $doc_id = $this->Document_model->insert($payload);
-                    $this->log_activity('document_submit', "Doc #$doc_id");
+
+                    // notify regional users
+                    $this->Notification_model->notify_regional(
+                        'Document Updated for Approval',
+                        sprintf('%s - %s (%s)',
+                            $this->current_user['full_name'] ?? '',
+                            $payload['document_title'],
+                            $school['school_name']
+                        ),
+                        site_url('documents/view/' . $doc_id)
+                    );
+
+                    $this->session->set_flashdata('success', 'Document updated and submitted for approval.');
+                    redirect('documents');
                 }
-
-                // notify regional users
-                $this->Notification_model->notify_regional(
-                    'New Document for Approval',
-                    sprintf('%s - %s (%s)',
-                        $this->current_user['full_name'] ?? '',
-                        $payload['document_title'],
-                        $school['school_name']
-                    ),
-                    site_url('documents/view/' . $doc_id)
-                );
-
-                $this->session->set_flashdata('success', 'Document submitted for approval.');
-                redirect('documents');
             }
         }
 
@@ -244,9 +288,9 @@ class Documents extends MY_Controller
         redirect('documents');
     }
 
-    private function _handle_upload()
+    private function _handle_upload($field_name = 'file')
     {
-        if (empty($_FILES['file']['name'])) return null;
+        if (empty($_FILES[$field_name]['name'])) return null;
         $upload_dir = FCPATH . 'uploads/documents/';
         if (!is_dir($upload_dir)) @mkdir($upload_dir, 0775, true);
 
@@ -259,7 +303,7 @@ class Documents extends MY_Controller
         ];
         $this->load->library('upload', $config);
 
-        if ($this->upload->do_upload('file')) {
+        if ($this->upload->do_upload($field_name)) {
             $info = $this->upload->data();
             return 'uploads/documents/' . $info['file_name'];
         }
