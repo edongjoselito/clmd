@@ -1,5 +1,5 @@
 <div class="card">
-  <div class="card-header bg-white"><strong><?= $is_edit ? 'Edit Document' : 'Submit Document' ?></strong></div>
+  <div class="card-header bg-white"><strong><?= $is_edit ? 'Edit Division Endorsement' : 'Division Endorsement' ?></strong></div>
   <div class="card-body">
     <?= validation_errors('<div class="alert alert-danger py-2">', '</div>') ?>
 
@@ -17,6 +17,8 @@
 
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
+      
+      <!-- School Selection -->
       <div class="row g-3">
         <div class="col-12">
           <label class="form-label">School *</label>
@@ -34,44 +36,80 @@
       </div>
 
       <hr>
-      <h5 class="mb-3">Certification of Compliance</h5>
-      <div class="row g-3 mb-4">
-        <div class="col-12">
-          <label class="form-label">Document Title *</label>
-          <input type="text" name="cert_title" class="form-control" required
-                 value="<?= htmlspecialchars(set_value('cert_title', $row['document_title'] ?? '')) ?>">
+
+      <!-- Current and Strengthened Curriculum Side by Side -->
+      <div class="row g-4">
+        <!-- Current Curriculum -->
+        <div class="col-md-6">
+          <h5 class="mb-3">Current Curriculum</h5>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Track *</label>
+              <select name="current_track" class="form-select" required>
+                <option value="">— Select Track —</option>
+                <option value="TVL Track" <?= set_value('current_track') === 'TVL Track' ? 'selected' : '' ?>>TVL Track</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Strand *</label>
+              <select name="current_strand" class="form-select" required>
+                <option value="">— Select Strand —</option>
+                <option value="I.A. Strand" <?= set_value('current_strand') === 'I.A. Strand' ? 'selected' : '' ?>>I.A. Strand</option>
+                <option value="H.E. Strand" <?= set_value('current_strand') === 'H.E. Strand' ? 'selected' : '' ?>>H.E. Strand</option>
+                <option value="ICT Strand" <?= set_value('current_strand') === 'ICT Strand' ? 'selected' : '' ?>>ICT Strand</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Specializations</label>
+              <textarea name="current_specializations" class="form-control" rows="3"><?= htmlspecialchars(set_value('current_specializations', '')) ?></textarea>
+            </div>
+          </div>
         </div>
-        <div class="col-12">
-          <label class="form-label">Upload Certification File (PDF only, max 50MB) *</label>
+
+        <!-- Strengthened Curriculum -->
+        <div class="col-md-6">
+          <h5 class="mb-3">Strengthened Curriculum</h5>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Track *</label>
+              <select name="strengthened_track" class="form-select" required>
+                <option value="">— Select Track —</option>
+                <option value="TechPro Track" <?= set_value('strengthened_track') === 'TechPro Track' ? 'selected' : '' ?>>TechPro Track</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Strand *</label>
+              <select name="strengthened_strand" class="form-select" required>
+                <option value="">— Select Strand —</option>
+                <option value="Industrial Technologies" <?= set_value('strengthened_strand') === 'Industrial Technologies' ? 'selected' : '' ?>>Industrial Technologies</option>
+                <option value="Hospitality and Tourism" <?= set_value('strengthened_strand') === 'Hospitality and Tourism' ? 'selected' : '' ?>>Hospitality and Tourism</option>
+                <option value="ICT Support and Computer Programming Technologies" <?= set_value('strengthened_strand') === 'ICT Support and Computer Programming Technologies' ? 'selected' : '' ?>>ICT Support and Computer Programming Technologies</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Specializations</label>
+              <textarea name="strengthened_specializations" class="form-control" rows="3"><?= htmlspecialchars(set_value('strengthened_specializations', '')) ?></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+      <h5 class="mb-3">Attachments</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label">Certification of Compliance (PDF only, max 50MB) *</label>
           <input type="file" name="cert_file" class="form-control" accept=".pdf,application/pdf" required>
           <?php if ($is_edit && !empty($row['file_path']) && $row['document_type'] === 'Certification of Compliance to DepEd Order No. 54, s. 2022'): ?>
             <small>Current: <a target="_blank" href="<?= base_url($row['file_path']) ?>">view file</a></small>
           <?php endif; ?>
         </div>
-        <div class="col-12">
-          <label class="form-label">Remarks</label>
-          <textarea name="cert_remarks" class="form-control" rows="2"><?= htmlspecialchars(set_value('cert_remarks', $row['remarks'] ?? '')) ?></textarea>
-        </div>
-      </div>
-
-      <hr>
-      <h5 class="mb-3">Endorsement</h5>
-      <div class="row g-3 mb-4">
-        <div class="col-12">
-          <label class="form-label">Document Title *</label>
-          <input type="text" name="endorse_title" class="form-control" required
-                 value="<?= htmlspecialchars(set_value('endorse_title', '')) ?>">
-        </div>
-        <div class="col-12">
-          <label class="form-label">Upload Endorsement File (PDF only, max 50MB) *</label>
+        <div class="col-md-6">
+          <label class="form-label">Endorsement (PDF only, max 50MB) *</label>
           <input type="file" name="endorse_file" class="form-control" accept=".pdf,application/pdf" required>
           <?php if ($is_edit && !empty($row['file_path']) && $row['document_type'] === 'Endorsement'): ?>
             <small>Current: <a target="_blank" href="<?= base_url($row['file_path']) ?>">view file</a></small>
           <?php endif; ?>
-        </div>
-        <div class="col-12">
-          <label class="form-label">Remarks</label>
-          <textarea name="endorse_remarks" class="form-control" rows="2"><?= htmlspecialchars(set_value('endorse_remarks', '')) ?></textarea>
         </div>
       </div>
 

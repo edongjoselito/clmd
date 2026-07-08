@@ -7,6 +7,43 @@
   <?php endif; ?>
 </div>
 
+<form method="get" class="card card-body py-2 mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small mb-1">Search</label>
+      <input type="text" name="q" class="form-control form-control-sm"
+             value="<?= htmlspecialchars($filters['search'] ?? '') ?>"
+             placeholder="School name, code...">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small mb-1">Type</label>
+      <select name="type" class="form-select form-select-sm">
+        <option value="">All</option>
+        <option value="Public" <?= ($filters['school_type'] ?? '') === 'Public' ? 'selected':'' ?>>Public</option>
+        <option value="Private" <?= ($filters['school_type'] ?? '') === 'Private' ? 'selected':'' ?>>Private</option>
+      </select>
+    </div>
+    <?php if ($_user['role'] === 'regional'): ?>
+      <div class="col-md-3">
+        <label class="form-label small mb-1">Division</label>
+        <select name="division_id" class="form-select form-select-sm">
+          <option value="">All Divisions</option>
+          <?php foreach ($divisions as $d): ?>
+            <option value="<?= $d['division_id'] ?>"
+              <?= (int)($filters['division_id'] ?? 0) === (int)$d['division_id'] ? 'selected':'' ?>>
+              <?= htmlspecialchars($d['code']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    <?php endif; ?>
+    <div class="col-auto">
+      <button class="btn btn-sm btn-primary"><i class="bi bi-funnel"></i></button>
+      <a class="btn btn-sm btn-light" href="<?= site_url('schools') ?>">Clear</a>
+    </div>
+  </div>
+</form>
+
 <div class="card">
   <div class="card-body">
     <div class="table-responsive">

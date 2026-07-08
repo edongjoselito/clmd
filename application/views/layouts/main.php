@@ -97,7 +97,7 @@
       <i class="bi bi-speedometer2"></i> Dashboard
     </a>
     <a class="nav-link <?= $uri === 'documents' ? 'active':'' ?>" href="<?= site_url('documents') ?>">
-      <i class="bi bi-file-earmark-text"></i> Documents
+      <i class="bi bi-file-earmark-text"></i> Endorsement
     </a>
     <a class="nav-link <?= $uri === 'schools' ? 'active':'' ?>" href="<?= site_url('schools') ?>">
       <i class="bi bi-building"></i> Schools

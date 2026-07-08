@@ -75,7 +75,7 @@ class Document_model extends CI_Model
 
     public function counts_by_status($division_id = null)
     {
-        $this->db->select('status, COUNT(*) AS total')
+        $this->db->select('status, COUNT(DISTINCT school_id) AS total')
                  ->from('documents')
                  ->group_by('status');
         if ($division_id) $this->db->where('division_id', $division_id);

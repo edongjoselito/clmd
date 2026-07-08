@@ -28,12 +28,30 @@ class Documents extends MY_Controller
         }, $rows))));
         $ready = $this->Document_model->ready_school_ids($school_ids);
 
+        // Group documents by school
+        $grouped = [];
+        foreach ($rows as $r) {
+            $sid = (int)$r['school_id'];
+            if (!isset($grouped[$sid])) {
+                $grouped[$sid] = [
+                    'school_id' => $r['school_id'],
+                    'school_name' => $r['school_name'],
+                    'school_type' => $r['school_type'],
+                    'division_code' => $r['division_code'] ?? null,
+                    'division_name' => $r['division_name'] ?? null,
+                    'documents' => []
+                ];
+            }
+            $grouped[$sid]['documents'][] = $r;
+        }
+
         $this->render('documents/index', [
             'rows'      => $rows,
+            'grouped'   => $grouped,
             'divisions' => $this->Division_model->all(),
             'filters'   => $filters,
             'ready'     => $ready,
-        ], 'Documents');
+        ], 'Division Endorsement');
     }
 
     public function create()
@@ -58,8 +76,10 @@ class Documents extends MY_Controller
 
         if ($this->input->method() === 'post') {
             $this->form_validation->set_rules('school_id', 'School', 'required|integer');
-            $this->form_validation->set_rules('cert_title', 'Certification Title', 'trim|required|max_length[255]');
-            $this->form_validation->set_rules('endorse_title', 'Endorsement Title', 'trim|required|max_length[255]');
+            $this->form_validation->set_rules('current_track', 'Current Track', 'required|max_length[100]');
+            $this->form_validation->set_rules('current_strand', 'Current Strand', 'required|max_length[100]');
+            $this->form_validation->set_rules('strengthened_track', 'Strengthened Track', 'required|max_length[100]');
+            $this->form_validation->set_rules('strengthened_strand', 'Strengthened Strand', 'required|max_length[150]');
 
             if ($this->form_validation->run() === TRUE) {
                 $school = $this->School_model->get($this->input->post('school_id'));
@@ -80,28 +100,40 @@ class Documents extends MY_Controller
 
                     // Insert Certification
                     $cert_payload = [
-                        'school_id'      => $school['school_id'],
-                        'division_id'    => $this->current_user['division_id'],
-                        'submitted_by'   => $this->current_user['user_id'],
-                        'document_title' => $this->input->post('cert_title', TRUE),
-                        'document_type'  => 'Certification of Compliance to DepEd Order No. 54, s. 2022',
-                        'file_path'      => $cert_fp,
-                        'remarks'        => $this->input->post('cert_remarks', TRUE) ?: null,
-                        'status'         => 'For Approval',
+                        'school_id'                  => $school['school_id'],
+                        'division_id'                => $this->current_user['division_id'],
+                        'submitted_by'               => $this->current_user['user_id'],
+                        'document_title'             => 'Certification of Compliance',
+                        'document_type'              => 'Certification of Compliance to DepEd Order No. 54, s. 2022',
+                        'file_path'                  => $cert_fp,
+                        'remarks'                    => null,
+                        'current_track'              => $this->input->post('current_track', TRUE),
+                        'current_strand'             => $this->input->post('current_strand', TRUE),
+                        'current_specializations'    => $this->input->post('current_specializations', TRUE) ?: null,
+                        'strengthened_track'         => $this->input->post('strengthened_track', TRUE),
+                        'strengthened_strand'        => $this->input->post('strengthened_strand', TRUE),
+                        'strengthened_specializations' => $this->input->post('strengthened_specializations', TRUE) ?: null,
+                        'status'                     => 'For Approval',
                     ];
                     $cert_id = $this->Document_model->insert($cert_payload);
                     $this->log_activity('document_submit', "Cert #$cert_id");
 
                     // Insert Endorsement
                     $endorse_payload = [
-                        'school_id'      => $school['school_id'],
-                        'division_id'    => $this->current_user['division_id'],
-                        'submitted_by'   => $this->current_user['user_id'],
-                        'document_title' => $this->input->post('endorse_title', TRUE),
-                        'document_type'  => 'Endorsement',
-                        'file_path'      => $endorse_fp,
-                        'remarks'        => $this->input->post('endorse_remarks', TRUE) ?: null,
-                        'status'         => 'For Approval',
+                        'school_id'                  => $school['school_id'],
+                        'division_id'                => $this->current_user['division_id'],
+                        'submitted_by'               => $this->current_user['user_id'],
+                        'document_title'             => 'Endorsement',
+                        'document_type'              => 'Endorsement',
+                        'file_path'                  => $endorse_fp,
+                        'remarks'                    => null,
+                        'current_track'              => $this->input->post('current_track', TRUE),
+                        'current_strand'             => $this->input->post('current_strand', TRUE),
+                        'current_specializations'    => $this->input->post('current_specializations', TRUE) ?: null,
+                        'strengthened_track'         => $this->input->post('strengthened_track', TRUE),
+                        'strengthened_strand'        => $this->input->post('strengthened_strand', TRUE),
+                        'strengthened_specializations' => $this->input->post('strengthened_specializations', TRUE) ?: null,
+                        'status'                     => 'For Approval',
                     ];
                     $endorse_id = $this->Document_model->insert($endorse_payload);
                     $this->log_activity('document_submit', "Endorse #$endorse_id");
@@ -121,9 +153,13 @@ class Documents extends MY_Controller
                 } else {
                     // Handle edit mode (single document)
                     $payload = [
-                        'school_id'      => $school['school_id'],
-                        'document_title' => $this->input->post('cert_title', TRUE),
-                        'remarks'        => $this->input->post('cert_remarks', TRUE) ?: null,
+                        'school_id'                  => $school['school_id'],
+                        'current_track'              => $this->input->post('current_track', TRUE),
+                        'current_strand'             => $this->input->post('current_strand', TRUE),
+                        'current_specializations'    => $this->input->post('current_specializations', TRUE) ?: null,
+                        'strengthened_track'         => $this->input->post('strengthened_track', TRUE),
+                        'strengthened_strand'        => $this->input->post('strengthened_strand', TRUE),
+                        'strengthened_specializations' => $this->input->post('strengthened_specializations', TRUE) ?: null,
                     ];
 
                     $fp = $this->_handle_upload('cert_file');
@@ -140,9 +176,8 @@ class Documents extends MY_Controller
                     // notify regional users
                     $this->Notification_model->notify_regional(
                         'Document Updated for Approval',
-                        sprintf('%s - %s (%s)',
+                        sprintf('%s - %s',
                             $this->current_user['full_name'] ?? '',
-                            $payload['document_title'],
                             $school['school_name']
                         ),
                         site_url('documents/view/' . $doc_id)
@@ -158,7 +193,7 @@ class Documents extends MY_Controller
             'row'     => $row,
             'is_edit' => $is_edit,
             'schools' => $this->School_model->for_dropdown($this->current_user['division_id']),
-        ], $is_edit ? 'Edit Document' : 'Submit Document');
+        ], $is_edit ? 'Edit Division Endorsement' : 'Division Endorsement');
     }
 
     public function view($id)
@@ -169,10 +204,19 @@ class Documents extends MY_Controller
             && (int)$row['division_id'] !== (int)$this->current_user['division_id']) {
             show_error('Forbidden', 403);
         }
+
+        // Get all documents for this school
+        $school_docs = $this->db->select('*')
+                                ->from('documents')
+                                ->where('school_id', $row['school_id'])
+                                ->order_by('created_at', 'DESC')
+                                ->get()->result_array();
+
         $this->render('documents/view', [
             'row'         => $row,
+            'school_docs' => $school_docs,
             'pair_ready'  => $this->Document_model->pair_ready($row['school_id']),
-        ], 'View Document');
+        ], 'View Submissions');
     }
 
     public function review($id)
@@ -286,6 +330,30 @@ class Documents extends MY_Controller
         $this->Document_model->delete($id);
         $this->session->set_flashdata('success', 'Document deleted.');
         redirect('documents');
+    }
+
+    public function view_file($id)
+    {
+        $row = $this->Document_model->get($id);
+        if (!$row) show_404();
+        if ($this->current_user['role'] === 'division'
+            && (int)$row['division_id'] !== (int)$this->current_user['division_id']) {
+            show_error('Forbidden', 403);
+        }
+        
+        $file_path = FCPATH . $row['file_path'];
+        if (!file_exists($file_path) || !is_readable($file_path)) {
+            show_404();
+        }
+        
+        // Output file with inline display headers
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="' . basename($file_path) . '"');
+        header('Content-Length: ' . filesize($file_path));
+        header('Cache-Control: public, must-revalidate, max-age=1');
+        header('Pragma: public');
+        readfile($file_path);
+        exit;
     }
 
     private function _handle_upload($field_name = 'file')

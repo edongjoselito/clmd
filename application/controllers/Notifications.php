@@ -34,4 +34,21 @@ class Notifications extends MY_Controller
         $this->Notification_model->mark_all_read($this->current_user['user_id']);
         redirect($this->input->server('HTTP_REFERER') ?: site_url('dashboard'));
     }
+
+    public function delete($id)
+    {
+        $this->db->delete('notifications', [
+            'notif_id' => $id,
+            'user_id' => $this->current_user['user_id']
+        ]);
+        $this->session->set_flashdata('success', 'Notification deleted.');
+        redirect('notifications');
+    }
+
+    public function delete_all()
+    {
+        $this->db->delete('notifications', ['user_id' => $this->current_user['user_id']]);
+        $this->session->set_flashdata('success', 'All notifications deleted.');
+        redirect('notifications');
+    }
 }

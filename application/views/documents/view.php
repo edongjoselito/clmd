@@ -2,76 +2,94 @@
 $badges = ['For Approval'=>'warning','Approved'=>'success','Rejected'=>'danger','Revised'=>'primary'];
 ?>
 <div class="card">
-  <div class="card-header bg-white d-flex justify-content-between">
-    <strong><?= htmlspecialchars($row['document_title']) ?></strong>
-    <span class="badge bg-<?= $badges[$row['status']] ?? 'secondary' ?>"><?= htmlspecialchars($row['status']) ?></span>
+  <div class="card-header bg-white">
+    <strong><?= htmlspecialchars($row['school_name']) ?></strong>
+    <span class="badge <?= $row['school_type']==='Private'?'bg-info':'bg-secondary' ?>"><?= $row['school_type'] ?></span>
   </div>
   <div class="card-body">
-    <dl class="row mb-0">
-      <?php if (!empty($row['control_no'])): ?>
-        <dt class="col-sm-3">Control No.</dt>
-        <dd class="col-sm-9"><code><?= htmlspecialchars($row['control_no']) ?></code></dd>
-      <?php endif; ?>
-      <dt class="col-sm-3">Document Type</dt><dd class="col-sm-9"><?= htmlspecialchars($row['document_type']) ?></dd>
-      <dt class="col-sm-3">School</dt>
-      <dd class="col-sm-9">
-        <?= htmlspecialchars($row['school_name']) ?>
-        <span class="badge <?= $row['school_type']==='Private'?'bg-info':'bg-secondary' ?>"><?= $row['school_type'] ?></span>
-        <?php
-          $addr_parts = array_filter([$row['barangay'] ?? '', $row['city'] ?? '', $row['province'] ?? '']);
-          $addr = $addr_parts ? implode(', ', $addr_parts) : '';
-        ?>
-        <div class="small text-muted">
-          <?= htmlspecialchars($addr) ?>
-          <?php if (!empty($row['school_email'])): ?>
-            &middot; <i class="bi bi-envelope"></i> <?= htmlspecialchars($row['school_email']) ?>
-          <?php endif; ?>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <small class="text-muted">Division</small>
+        <div><?= htmlspecialchars($row['division_name'] ?? '—') ?></div>
+      </div>
+      <div class="col-md-6">
+        <small class="text-muted">Address</small>
+        <div>
+          <?php
+            $addr_parts = array_filter([$row['barangay'] ?? '', $row['city'] ?? '', $row['province'] ?? '']);
+            echo htmlspecialchars(implode(', ', $addr_parts));
+          ?>
         </div>
-      </dd>
-      <dt class="col-sm-3">Division</dt><dd class="col-sm-9"><?= htmlspecialchars($row['division_name'] ?? '—') ?></dd>
-      <dt class="col-sm-3">Submitted by</dt>
-      <dd class="col-sm-9"><?= htmlspecialchars($row['submitted_by_name'] ?? '—') ?>
-        on <?= date('M d, Y H:i', strtotime($row['created_at'])) ?></dd>
-      <?php if (!empty($row['reviewed_at'])): ?>
-        <dt class="col-sm-3">Reviewed by</dt>
-        <dd class="col-sm-9"><?= htmlspecialchars($row['reviewed_by_name'] ?? '—') ?>
-          on <?= date('M d, Y H:i', strtotime($row['reviewed_at'])) ?></dd>
-      <?php endif; ?>
-      <?php if (!empty($row['remarks'])): ?>
-        <dt class="col-sm-3">Remarks</dt>
-        <dd class="col-sm-9"><?= nl2br(htmlspecialchars($row['remarks'])) ?></dd>
-      <?php endif; ?>
-      <?php if (!empty($row['review_notes'])): ?>
-        <dt class="col-sm-3">Reviewer Notes</dt>
-        <dd class="col-sm-9"><?= nl2br(htmlspecialchars($row['review_notes'])) ?></dd>
-      <?php endif; ?>
-      <dt class="col-sm-3">File</dt>
-      <dd class="col-sm-9">
-        <?php if (!empty($row['file_path'])): ?>
-          <a target="_blank" href="<?= base_url($row['file_path']) ?>">
-            <i class="bi bi-file-earmark-arrow-down"></i> Download
-          </a>
-        <?php else: ?>—<?php endif; ?>
-      </dd>
-    </dl>
+      </div>
+    </div>
+
+    <h6 class="fw-bold mb-3">Documents</h6>
+    <div class="table-responsive">
+      <table class="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>Attachment</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($school_docs as $doc): ?>
+            <tr>
+              <td><?= htmlspecialchars($doc['document_type']) ?></td>
+              <td>
+                <strong><?= htmlspecialchars($doc['document_title']) ?></strong>
+                <?php if (!empty($doc['review_notes'])): ?>
+                  <div class="small text-danger"><?= htmlspecialchars($doc['review_notes']) ?></div>
+                <?php endif; ?>
+              </td>
+              <td>
+                <span class="badge bg-<?= $badges[$doc['status']] ?? 'secondary' ?> rounded-pill">
+                  <?= htmlspecialchars($doc['status']) ?>
+                </span>
+              </td>
+              <td><?= date('M d, Y', strtotime($doc['created_at'])) ?></td>
+              <td>
+                <?php if (!empty($doc['file_path'])): ?>
+                  <a target="_blank" href="<?= base_url($doc['file_path']) ?>" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-file-earmark-pdf"></i> View
+                  </a>
+                <?php else: ?>
+                  —
+                <?php endif; ?>
+              </td>
+              <td class="text-end">
+                <?php if ($_user['role'] === 'regional' && $doc['status'] === 'For Approval'): ?>
+                  <a class="btn btn-sm btn-primary" href="<?= site_url('documents/review/'.$doc['document_id']) ?>">
+                    Review
+                  </a>
+                <?php endif; ?>
+                <?php if ($_user['role'] === 'division' && $doc['status'] !== 'Approved'): ?>
+                  <a class="btn btn-sm btn-outline-primary" href="<?= site_url('documents/edit/'.$doc['document_id']) ?>">
+                    Edit
+                  </a>
+                <?php endif; ?>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div class="card-footer bg-white">
     <a href="<?= site_url('documents') ?>" class="btn btn-light btn-sm">Back</a>
-    <?php if ($_user['role'] === 'regional' && $row['status'] === 'For Approval'): ?>
-      <a class="btn btn-primary btn-sm" href="<?= site_url('documents/review/'.$row['document_id']) ?>">
-        <i class="bi bi-clipboard-check"></i> Review
-      </a>
-    <?php endif; ?>
     <?php if (!empty($pair_ready)): ?>
       <a class="btn btn-success btn-sm" target="_blank"
          href="<?= site_url('documents/certificate/'.$row['school_id']) ?>">
         <i class="bi bi-printer"></i> Print Combined Certification
       </a>
-    <?php elseif ($row['status'] === 'Approved'): ?>
+    <?php else: ?>
       <span class="text-muted small ms-2">
         <i class="bi bi-info-circle"></i>
-        Print available once <strong>both</strong> the Certification of Compliance to DepEd Order No. 54, s. 2022
-        and the Endorsement for this school are approved.
+        Print available once both documents are approved.
       </span>
     <?php endif; ?>
   </div>
