@@ -73,6 +73,7 @@ class Documents extends MY_Controller
     private function _form($row = null)
     {
         $is_edit = !empty($row);
+        $pair = $is_edit ? $this->Document_model->get_pair($row['school_id']) : null;
 
         if ($this->input->method() === 'post') {
             $this->form_validation->set_rules('school_id', 'School', 'required|integer');
@@ -151,9 +152,8 @@ class Documents extends MY_Controller
                     $this->session->set_flashdata('success', 'Both documents submitted for approval.');
                     redirect('documents');
                 } else {
-                    // Handle edit mode (single document)
-                    $payload = [
-                        'school_id'                  => $school['school_id'],
+                    // Edit mode: update both certification and endorsement with shared curriculum data
+                    $common_payload = [
                         'current_track'              => $this->input->post('current_track', TRUE),
                         'current_strand'             => $this->input->post('current_strand', TRUE),
                         'current_specializations'    => $this->input->post('current_specializations', TRUE) ?: null,
@@ -162,28 +162,34 @@ class Documents extends MY_Controller
                         'strengthened_specializations' => $this->input->post('strengthened_specializations', TRUE) ?: null,
                     ];
 
-                    $fp = $this->_handle_upload('cert_file');
-                    if ($fp) $payload['file_path'] = $fp;
+                    foreach (['certification', 'endorsement'] as $doc_type) {
+                        $doc = $pair[$doc_type] ?? null;
+                        if (!$doc || $doc['status'] === 'Approved') continue;
 
-                    if ($row['status'] !== 'For Approval') {
-                        $payload['status']       = 'For Approval';
-                        $payload['review_notes'] = null;
+                        $payload = $common_payload;
+                        $file_field = $doc_type === 'endorsement' ? 'endorse_file' : 'cert_file';
+                        $fp = $this->_handle_upload($file_field);
+                        if ($fp) $payload['file_path'] = $fp;
+
+                        if ($doc['status'] !== 'For Approval') {
+                            $payload['status']       = 'For Approval';
+                            $payload['review_notes'] = null;
+                        }
+                        $this->Document_model->update($doc['document_id'], $payload);
+                        $this->log_activity('document_update', "Doc #{$doc['document_id']}");
                     }
-                    $this->Document_model->update($row['document_id'], $payload);
-                    $doc_id = $row['document_id'];
-                    $this->log_activity('document_update', "Doc #$doc_id");
 
                     // notify regional users
                     $this->Notification_model->notify_regional(
-                        'Document Updated for Approval',
+                        'Documents Updated for Approval',
                         sprintf('%s - %s',
                             $this->current_user['full_name'] ?? '',
                             $school['school_name']
                         ),
-                        site_url('documents/view/' . $doc_id)
+                        site_url('documents/view/' . $row['document_id'])
                     );
 
-                    $this->session->set_flashdata('success', 'Document updated and submitted for approval.');
+                    $this->session->set_flashdata('success', 'Documents updated and submitted for approval.');
                     redirect('documents');
                 }
             }
@@ -191,6 +197,7 @@ class Documents extends MY_Controller
 
         $this->render('documents/form', [
             'row'     => $row,
+            'pair'    => $pair,
             'is_edit' => $is_edit,
             'schools' => $this->School_model->for_dropdown($this->current_user['division_id']),
         ], $is_edit ? 'Edit Division Endorsement' : 'Division Endorsement');

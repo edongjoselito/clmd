@@ -7,7 +7,11 @@ class User_model extends CI_Model
 
     public function get_by_username($username)
     {
-        return $this->db->get_where($this->table, ['username' => $username])->row_array();
+        return $this->db->where('username', $username)
+                        ->or_where('email', $username)
+                        ->limit(1)
+                        ->get($this->table)
+                        ->row_array();
     }
 
     public function get($id)
@@ -63,6 +67,15 @@ class User_model extends CI_Model
     public function username_exists($username, $exclude_id = null)
     {
         $this->db->where('username', $username);
+        if ($exclude_id) {
+            $this->db->where('user_id !=', $exclude_id);
+        }
+        return $this->db->count_all_results($this->table) > 0;
+    }
+
+    public function email_exists($email, $exclude_id = null)
+    {
+        $this->db->where('email', $email);
         if ($exclude_id) {
             $this->db->where('user_id !=', $exclude_id);
         }

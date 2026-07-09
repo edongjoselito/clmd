@@ -38,7 +38,7 @@
     <form method="post" action="<?= site_url('login') ?>" autocomplete="off">
       <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
       <div class="mb-3">
-        <label class="form-label">Username</label>
+        <label class="form-label">Username / Email</label>
         <input type="text" name="username" class="form-control" required
                value="<?= htmlspecialchars($username) ?>" autofocus>
       </div>

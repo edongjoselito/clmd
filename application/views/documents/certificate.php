@@ -18,6 +18,12 @@
   .body-text strong.school { text-transform: uppercase; }
   .doc-list { margin: 14px 24px; font-size: 13.5px; }
   .doc-list li { margin-bottom: 6px; }
+  .curriculum-title { font-size: 14px; font-weight: bold; margin: 18px 0 6px 0; color: #0a3d62; }
+  .curriculum-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px; }
+  .curriculum-table th { background: #0a3d62; color: #fff; padding: 7px 10px; text-align: left; border: 1px solid #0a3d62; }
+  .curriculum-table td { border: 1px solid #999; padding: 8px 10px; vertical-align: top; }
+  .curriculum-table td ul { margin: 0; padding-left: 18px; }
+  .curriculum-table td li { margin-bottom: 3px; }
   .signatory { margin-top: 50px; text-align: center; }
   .signatory .sigline { display: inline-block; min-width: 300px; border-bottom: 1px solid #222; padding-bottom: 4px; }
   .signatory img.esig { max-height: 70px; display: block; margin: 0 auto -8px; }
@@ -53,45 +59,79 @@
   </div>
 
   <div class="title">CERTIFICATION</div>
-  <div class="subtitle">TO WHOM IT MAY CONCERN:</div>
+
+  <?php
+    $addr_parts = array_filter([$cert['barangay'] ?? '', $cert['city'] ?? '', $cert['province'] ?? '']);
+    $addr = $addr_parts ? implode(', ', $addr_parts) : '';
+  ?>
+
+  <?php
+    $parse_specs = function ($text) {
+        if (empty($text)) return [];
+        return array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n|,/', $text))));
+    };
+    $current_specs    = $parse_specs($cert['current_specializations']);
+    $strengthened_specs = $parse_specs($cert['strengthened_specializations']);
+  ?>
 
   <div class="body-text">
-    <p>This is to certify that <strong class="school"><?= htmlspecialchars($cert['school_name']) ?></strong>,
-    a <?= strtolower($cert['school_type']) ?> school
-    <?php
-      $addr_parts = array_filter([$cert['barangay'] ?? '', $cert['city'] ?? '', $cert['province'] ?? '']);
-      $addr = $addr_parts ? implode(', ', $addr_parts) : '';
-    ?>
-    <?php if ($addr !== ''): ?>
-      located at <?= htmlspecialchars($addr) ?>,
-    <?php endif; ?>
-    under the supervision of the <?= htmlspecialchars($cert['division_name']) ?>,
-    has been found <strong>compliant</strong> with
-    <strong>DepEd Order No. 54, s. 2022</strong>, based on the documents
-    submitted, reviewed, and duly approved by the Curriculum and Learning
-    Management Division, DepEd Region XI.</p>
+    <p>This is to certify that <strong class="school"><?= htmlspecialchars($cert['school_name']) ?> - <?= htmlspecialchars($addr) ?>, <?= htmlspecialchars($cert['division_name']) ?></strong> is compliant to DepEd Order No. 54, S. 2022 known as the Guidelines on the Selection of Senior High School Technical-Vocational-Livelihood (SHS-TVL) Specializations as per recommendation of the Curriculum Implementation Division (CID) Chief Education Supervisor and the Schools Division Superintendent for School Year 2026-2027.</p>
 
-    <p>The following documents form part of this certification:</p>
-    <ol class="doc-list">
-      <li>
-        <strong>Certification of Compliance to DepEd Order No. 54, s. 2022</strong>
-        &mdash; <em><?= htmlspecialchars($cert['document_title']) ?></em>
-        (Control No. <?= htmlspecialchars($cert['control_no']) ?>),
-        approved on <?= date('F d, Y', strtotime($cert['approved_at'] ?: $cert['reviewed_at'])) ?>.
-      </li>
-      <li>
-        <strong>Endorsement</strong>
-        &mdash; <em><?= htmlspecialchars($endorse['document_title']) ?></em>
-        (Control No. <?= htmlspecialchars($endorse['control_no']) ?>),
-        approved on <?= date('F d, Y', strtotime($endorse['approved_at'] ?: $endorse['reviewed_at'])) ?>.
-      </li>
-    </ol>
+    <div class="curriculum-title">Current Curriculum</div>
+    <table class="curriculum-table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Track</th>
+          <th style="width: 30%;">Strand</th>
+          <th style="width: 40%;">Specializations</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><?= htmlspecialchars($cert['current_track']) ?></td>
+          <td><?= htmlspecialchars($cert['current_strand']) ?></td>
+          <td>
+            <?php if (!empty($current_specs)): ?>
+              <ul>
+                <?php foreach ($current_specs as $spec): ?>
+                  <li><?= htmlspecialchars($spec) ?></li>
+                <?php endforeach; ?>
+              </ul>
+            <?php else: ?>
+              —
+            <?php endif; ?>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-    <p>This Certification is being issued upon the request of the school for
-    whatever legal purpose it may serve.</p>
-
-    <p>Issued this <?= date('jS') ?> day of <?= date('F Y') ?> at DepEd Region XI,
-    Davao City, Philippines.</p>
+    <div class="curriculum-title">Strengthened Curriculum</div>
+    <table class="curriculum-table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Track</th>
+          <th style="width: 30%;">Strand</th>
+          <th style="width: 40%;">Specializations</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><?= htmlspecialchars($cert['strengthened_track']) ?></td>
+          <td><?= htmlspecialchars($cert['strengthened_strand']) ?></td>
+          <td>
+            <?php if (!empty($strengthened_specs)): ?>
+              <ul>
+                <?php foreach ($strengthened_specs as $spec): ?>
+                  <li><?= htmlspecialchars($spec) ?></li>
+                <?php endforeach; ?>
+              </ul>
+            <?php else: ?>
+              —
+            <?php endif; ?>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="signatory">

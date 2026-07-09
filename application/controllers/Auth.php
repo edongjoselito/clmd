@@ -28,7 +28,7 @@ class Auth extends CI_Controller
             $data['username'] = $username;
 
             if ($username === '' || $password === '') {
-                $data['error'] = 'Please provide both username and password.';
+                $data['error'] = 'Please provide both username/email and password.';
             } else {
                 $user = $this->User_model->get_by_username($username);
                 if (!$user || (int)$user['is_active'] !== 1 || !password_verify($password, $user['password'])) {

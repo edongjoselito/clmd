@@ -102,19 +102,15 @@
     <a class="nav-link <?= $uri === 'schools' ? 'active':'' ?>" href="<?= site_url('schools') ?>">
       <i class="bi bi-building"></i> Schools
     </a>
-    <a class="nav-link <?= $uri === 'notifications' ? 'active':'' ?>" href="<?= site_url('notifications') ?>">
-      <i class="bi bi-bell"></i> Notifications
-      <?php if ($_unread_count > 0): ?>
-        <span class="badge bg-danger ms-1"><?= $_unread_count ?></span>
-      <?php endif; ?>
-    </a>
-    <?php if ($role === 'regional'): ?>
+    <?php if ($role === 'regional' || $role === 'division'): ?>
       <hr class="text-white-50 my-2">
-      <a class="nav-link <?= $uri === 'divisions' ? 'active':'' ?>" href="<?= site_url('divisions') ?>">
-        <i class="bi bi-diagram-3"></i> Divisions
-      </a>
       <a class="nav-link <?= $uri === 'users' ? 'active':'' ?>" href="<?= site_url('users') ?>">
         <i class="bi bi-people"></i> Users
+      </a>
+    <?php endif; ?>
+    <?php if ($role === 'regional'): ?>
+      <a class="nav-link <?= $uri === 'divisions' ? 'active':'' ?>" href="<?= site_url('divisions') ?>">
+        <i class="bi bi-diagram-3"></i> Divisions
       </a>
       <a class="nav-link <?= $uri === 'settings' ? 'active':'' ?>" href="<?= site_url('settings') ?>">
         <i class="bi bi-gear"></i> Settings
@@ -167,9 +163,16 @@
       <span class="badge <?= $role === 'regional' ? 'badge-role-regional' : 'badge-role-division' ?>">
         <?= ucfirst($role) ?> User
       </span>
-      <span class="text-muted small">
-        <?= htmlspecialchars($_user['full_name']) ?>
-      </span>
+      <div class="dropdown">
+        <button class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person-circle me-1"></i> <?= htmlspecialchars($_user['full_name']) ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="<?= site_url('change_password') ?>"><i class="bi bi-shield-lock me-2"></i> Change Password</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="<?= site_url('logout') ?>"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+        </ul>
+      </div>
     </div>
   </div>
 

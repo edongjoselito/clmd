@@ -10,7 +10,7 @@
     <table class="table table-hover mb-0 align-middle">
       <thead class="table-light">
         <tr>
-          <th>Username</th><th>Full Name</th><th>Role</th>
+          <th>Email</th><th>Full Name</th><th>Role</th>
           <th>Division</th><th>Status</th><th>Last Login</th><th class="text-end">Actions</th>
         </tr>
       </thead>
@@ -19,7 +19,7 @@
           <tr><td colspan="7" class="text-center text-muted py-4">No users.</td></tr>
         <?php else: foreach ($users as $u): ?>
           <tr>
-            <td><?= htmlspecialchars($u['username']) ?></td>
+            <td><?= htmlspecialchars($u['email'] ?: $u['username']) ?></td>
             <td><?= htmlspecialchars($u['full_name']) ?></td>
             <td>
               <span class="badge <?= $u['role'] === 'regional' ? 'badge-role-regional' : 'badge-role-division' ?>">

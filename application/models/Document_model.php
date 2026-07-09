@@ -90,6 +90,23 @@ class Document_model extends CI_Model
      * Get the latest Approved Certification + Endorsement docs for a school.
      * Returns ['certification' => row|null, 'endorsement' => row|null].
      */
+    public function get_pair($school_id)
+    {
+        $fetch = function ($type) use ($school_id) {
+            return $this->db->where([
+                                'school_id'     => $school_id,
+                                'document_type' => $type,
+                            ])
+                            ->order_by('created_at', 'DESC')
+                            ->limit(1)
+                            ->get($this->table)->row_array();
+        };
+        return [
+            'certification' => $fetch(self::TYPE_CERTIFICATION),
+            'endorsement'   => $fetch(self::TYPE_ENDORSEMENT),
+        ];
+    }
+
     public function get_approved_pair($school_id)
     {
         $fetch = function ($type) use ($school_id) {
