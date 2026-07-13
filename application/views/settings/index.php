@@ -14,9 +14,15 @@
           <input type="text" name="chief_position" class="form-control"
                  value="<?= htmlspecialchars($settings['chief_position'] ?? '') ?>">
         </div>
-        <div class="col-12">
-          <label class="form-label">Letterhead Text (used on certificates)</label>
-          <textarea name="letterhead_text" class="form-control" rows="3"><?= htmlspecialchars($settings['letterhead_text'] ?? '') ?></textarea>
+        <div class="col-md-6">
+          <label class="form-label">Letterhead Image (PNG/JPG)</label>
+          <input type="file" name="letterhead" class="form-control" accept="image/png,image/jpeg">
+          <?php if (!empty($settings['letterhead_path'])): ?>
+            <div class="mt-2 p-2 border rounded bg-white">
+              <small class="text-muted">Current:</small><br>
+              <img src="<?= base_url($settings['letterhead_path']) ?>" style="max-height:100px;">
+            </div>
+          <?php endif; ?>
         </div>
         <div class="col-md-6">
           <label class="form-label">e-Signature Image (PNG/JPG, transparent PNG recommended)</label>

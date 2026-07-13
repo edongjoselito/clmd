@@ -29,31 +29,22 @@ class Divisions extends MY_Controller
         $is_edit = !empty($div);
 
         if ($this->input->method() === 'post') {
-            $this->form_validation->set_rules('code', 'Code', 'trim|required|max_length[20]');
             $this->form_validation->set_rules('name', 'Name', 'trim|required|max_length[150]');
 
             if ($this->form_validation->run() === TRUE) {
-                $code    = $this->input->post('code', TRUE);
-                $exclude = $is_edit ? $div['division_id'] : null;
-
-                if ($this->Division_model->code_exists($code, $exclude)) {
-                    $this->session->set_flashdata('error', 'Division code already exists.');
+                $payload = [
+                    'name'      => $this->input->post('name', TRUE),
+                    'address'   => $this->input->post('address', TRUE) ?: null,
+                    'contact'   => $this->input->post('contact', TRUE) ?: null,
+                    'is_active' => $this->input->post('is_active') ? 1 : 0,
+                ];
+                if ($is_edit) {
+                    $this->Division_model->update($div['division_id'], $payload);
                 } else {
-                    $payload = [
-                        'code'      => $code,
-                        'name'      => $this->input->post('name', TRUE),
-                        'address'   => $this->input->post('address', TRUE) ?: null,
-                        'contact'   => $this->input->post('contact', TRUE) ?: null,
-                        'is_active' => $this->input->post('is_active') ? 1 : 0,
-                    ];
-                    if ($is_edit) {
-                        $this->Division_model->update($div['division_id'], $payload);
-                    } else {
-                        $this->Division_model->insert($payload);
-                    }
-                    $this->session->set_flashdata('success', 'Division saved.');
-                    redirect('divisions');
+                    $this->Division_model->insert($payload);
                 }
+                $this->session->set_flashdata('success', 'Division saved.');
+                redirect('divisions');
             }
         }
 

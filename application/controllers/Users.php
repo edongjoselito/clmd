@@ -54,6 +54,10 @@ class Users extends MY_Controller
             $this->form_validation->set_rules('division_id', 'Division', 'integer');
             if (!$is_edit) {
                 $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[8]');
+            } else {
+                if (!empty($this->input->post('password'))) {
+                    $this->form_validation->set_rules('password', 'Password', 'trim|min_length[8]');
+                }
             }
 
             if ($this->form_validation->run() === TRUE) {

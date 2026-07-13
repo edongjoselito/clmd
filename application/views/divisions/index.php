@@ -10,16 +10,15 @@
     <table class="table table-hover mb-0 align-middle">
       <thead class="table-light">
         <tr>
-          <th>Code</th><th>Name</th><th>Address</th><th>Contact</th>
+          <th>Name</th><th>Address</th><th>Contact</th>
           <th>Status</th><th class="text-end">Actions</th>
         </tr>
       </thead>
       <tbody>
         <?php if (empty($divisions)): ?>
-          <tr><td colspan="6" class="text-center text-muted py-4">No divisions.</td></tr>
+          <tr><td colspan="5" class="text-center text-muted py-4">No divisions.</td></tr>
         <?php else: foreach ($divisions as $d): ?>
           <tr>
-            <td><strong><?= htmlspecialchars($d['code']) ?></strong></td>
             <td><?= htmlspecialchars($d['name']) ?></td>
             <td><?= htmlspecialchars($d['address'] ?? '—') ?></td>
             <td><?= htmlspecialchars($d['contact'] ?? '—') ?></td>

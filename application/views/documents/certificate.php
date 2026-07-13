@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <title>Certification - <?= htmlspecialchars($cert['control_no']) ?></title>
 <style>
-  @page { size: A4; margin: 18mm 18mm 20mm 18mm; }
+  @page { size: A4; margin: 3mm 8mm 20mm 8mm; }
   * { box-sizing: border-box; }
   body { font-family: 'Times New Roman', Times, serif; color:#222; margin:0; padding:0; background:#fff; }
-  .page { width: 210mm; min-height: 297mm; padding: 16mm 18mm; margin: 0 auto; background:#fff; position:relative; }
-  .letterhead { text-align:center; border-bottom: 2px solid #0a3d62; padding-bottom: 8px; }
+  .page { width: 210mm; min-height: 297mm; padding: 16mm 8mm; margin: 0 auto; background:#fff; position:relative; }
+  .letterhead { text-align:center; padding-bottom: 8px; }
   .letterhead .small-text { font-size: 12px; }
   .letterhead h2 { margin: 4px 0; color:#0a3d62; letter-spacing: 1px; }
-  .control-no { position: absolute; top: 16mm; right: 18mm; font-size: 11px; color:#555; text-align:right; }
+  .control-no { position: absolute; top: 16mm; right: 8mm; font-size: 11px; color:#555; text-align:right; }
   .title { text-align:center; margin-top: 32px; letter-spacing: 4px; font-size: 22px; font-weight: bold; color:#0a3d62; }
   .subtitle { text-align:center; font-style: italic; color:#555; margin-bottom: 22px; }
   .body-text { font-size: 13.5px; line-height: 1.75; text-align: justify; padding: 0 12px; }
@@ -52,10 +52,14 @@
   </div>
 
   <div class="letterhead">
-    <div class="small-text">Republic of the Philippines</div>
-    <div class="small-text">Department of Education</div>
-    <h2>REGION XI - DAVAO REGION</h2>
-    <div class="small-text">Curriculum and Learning Management Division (CLMD)</div>
+    <?php if (!empty($settings['letterhead_path']) && file_exists(FCPATH.$settings['letterhead_path'])): ?>
+      <img src="<?= base_url($settings['letterhead_path']) ?>" alt="Letterhead" style="width:100%; height:auto;">
+    <?php else: ?>
+      <div class="small-text">Republic of the Philippines</div>
+      <div class="small-text">Department of Education</div>
+      <h2>REGION XI - DAVAO REGION</h2>
+      <div class="small-text">Curriculum and Learning Management Division (CLMD)</div>
+    <?php endif; ?>
   </div>
 
   <div class="title">CERTIFICATION</div>

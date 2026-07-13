@@ -6,12 +6,7 @@
     <form method="post">
       <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
       <div class="row g-3">
-        <div class="col-md-3">
-          <label class="form-label">Code *</label>
-          <input type="text" name="code" class="form-control" required maxlength="20"
-                 value="<?= htmlspecialchars(set_value('code', $div['code'] ?? '')) ?>">
-        </div>
-        <div class="col-md-9">
+        <div class="col-md-12">
           <label class="form-label">Name *</label>
           <input type="text" name="name" class="form-control" required
                  value="<?= htmlspecialchars(set_value('name', $div['name'] ?? '')) ?>">
