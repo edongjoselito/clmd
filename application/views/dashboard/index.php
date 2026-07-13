@@ -63,7 +63,7 @@
       <div class="card stat-card p-4 h-100 border-0">
         <div class="d-flex align-items-start justify-content-between">
           <div>
-            <small class="text-muted text-uppercase fw-semibold tracking-wide mb-2 d-block" style="font-size: 0.75rem;">For Revision</small>
+            <small class="text-muted text-uppercase fw-semibold tracking-wide mb-2 d-block" style="font-size: 0.75rem;">For Compliance</small>
             <div class="num text-primary fw-bold" style="font-size: 2rem;"><?= (int)$counts['Revised'] ?></div>
           </div>
           <div class="bg-primary bg-opacity-10 p-3 rounded-3">

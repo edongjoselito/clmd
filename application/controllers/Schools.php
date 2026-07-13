@@ -7,7 +7,34 @@ class Schools extends MY_Controller
     {
         parent::__construct();
         $this->require_login();
-        $this->load->model(['School_model','Division_model']);
+        $this->load->model(['School_model','Division_model','Location_model']);
+    }
+
+    public function ajax_municipalities()
+    {
+        $this->output->set_content_type('application/json');
+        try {
+            $province = $this->input->get('province', TRUE);
+            echo json_encode($this->Location_model->get_municipalities($province));
+        } catch (Exception $e) {
+            log_message('error', 'ajax_municipalities: ' . $e->getMessage());
+            $this->output->set_status_header(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function ajax_barangays()
+    {
+        $this->output->set_content_type('application/json');
+        try {
+            $province = $this->input->get('province', TRUE);
+            $municipality = $this->input->get('municipality', TRUE);
+            echo json_encode($this->Location_model->get_barangays($province, $municipality));
+        } catch (Exception $e) {
+            log_message('error', 'ajax_barangays: ' . $e->getMessage());
+            $this->output->set_status_header(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
     }
 
     public function index()
@@ -82,8 +109,23 @@ class Schools extends MY_Controller
             }
         }
 
+        $provinces = $this->Location_model->get_provinces();
+        $municipalities = [];
+        $barangays = [];
+
+        if ($is_edit && !empty($row['province'])) {
+            $municipalities = $this->Location_model->get_municipalities($row['province']);
+            if (!empty($row['city'])) {
+                $barangays = $this->Location_model->get_barangays($row['province'], $row['city']);
+            }
+        }
+
         $this->render('schools/form', [
-            'row' => $row, 'is_edit' => $is_edit
+            'row'            => $row,
+            'is_edit'        => $is_edit,
+            'provinces'      => $provinces,
+            'municipalities' => $municipalities,
+            'barangays'      => $barangays,
         ], $is_edit ? 'Edit School' : 'New School');
     }
 

@@ -59,21 +59,30 @@
               <label class="form-label">Track *</label>
               <select name="current_track" class="form-select" required>
                 <option value="">— Select Track —</option>
-                <option value="TVL Track" <?= set_value('current_track', $row['current_track'] ?? '') === 'TVL Track' ? 'selected' : '' ?>>TVL Track</option>
+                <?php
+                $current_tracks = array_filter(array_map('trim', explode("\n", $settings['current_tracks'] ?? 'TVL Track')));
+                foreach ($current_tracks as $track): ?>
+                  <option value="<?= htmlspecialchars($track) ?>" <?= set_value('current_track', $row['current_track'] ?? '') === $track ? 'selected' : '' ?>><?= htmlspecialchars($track) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
             <div class="col-12">
               <label class="form-label">Strand *</label>
               <select name="current_strand" class="form-select" required>
                 <option value="">— Select Strand —</option>
-                <option value="I.A. Strand" <?= set_value('current_strand', $row['current_strand'] ?? '') === 'I.A. Strand' ? 'selected' : '' ?>>I.A. Strand</option>
-                <option value="H.E. Strand" <?= set_value('current_strand', $row['current_strand'] ?? '') === 'H.E. Strand' ? 'selected' : '' ?>>H.E. Strand</option>
-                <option value="ICT Strand" <?= set_value('current_strand', $row['current_strand'] ?? '') === 'ICT Strand' ? 'selected' : '' ?>>ICT Strand</option>
+                <?php
+                $current_strands = array_filter(array_map('trim', explode("\n", $settings['current_strands'] ?? "I.A. Strand\nH.E. Strand\nICT Strand")));
+                foreach ($current_strands as $strand): ?>
+                  <option value="<?= htmlspecialchars($strand) ?>" <?= set_value('current_strand', $row['current_strand'] ?? '') === $strand ? 'selected' : '' ?>><?= htmlspecialchars($strand) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
             <div class="col-12">
-              <label class="form-label">Specializations</label>
-              <textarea name="current_specializations" class="form-control" rows="3"><?= htmlspecialchars(set_value('current_specializations', $row['current_specializations'] ?? '')) ?></textarea>
+              <label class="form-label">Specializations *</label>
+              <div id="current_specializations_container" class="border p-3 rounded bg-light" style="min-height: 60px;">
+                <small class="text-muted">Select a strand first to see available specializations.</small>
+              </div>
+              <input type="hidden" name="current_specializations" id="current_specializations_input" value="<?= htmlspecialchars(set_value('current_specializations', $row['current_specializations'] ?? '')) ?>">
             </div>
           </div>
         </div>
@@ -86,21 +95,30 @@
               <label class="form-label">Track *</label>
               <select name="strengthened_track" class="form-select" required>
                 <option value="">— Select Track —</option>
-                <option value="TechPro Track" <?= set_value('strengthened_track', $row['strengthened_track'] ?? '') === 'TechPro Track' ? 'selected' : '' ?>>TechPro Track</option>
+                <?php
+                $strengthened_tracks = array_filter(array_map('trim', explode("\n", $settings['strengthened_tracks'] ?? 'TechPro Track')));
+                foreach ($strengthened_tracks as $track): ?>
+                  <option value="<?= htmlspecialchars($track) ?>" <?= set_value('strengthened_track', $row['strengthened_track'] ?? '') === $track ? 'selected' : '' ?>><?= htmlspecialchars($track) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
             <div class="col-12">
               <label class="form-label">Strand *</label>
               <select name="strengthened_strand" class="form-select" required>
                 <option value="">— Select Strand —</option>
-                <option value="Industrial Technologies" <?= set_value('strengthened_strand', $row['strengthened_strand'] ?? '') === 'Industrial Technologies' ? 'selected' : '' ?>>Industrial Technologies</option>
-                <option value="Hospitality and Tourism" <?= set_value('strengthened_strand', $row['strengthened_strand'] ?? '') === 'Hospitality and Tourism' ? 'selected' : '' ?>>Hospitality and Tourism</option>
-                <option value="ICT Support and Computer Programming Technologies" <?= set_value('strengthened_strand', $row['strengthened_strand'] ?? '') === 'ICT Support and Computer Programming Technologies' ? 'selected' : '' ?>>ICT Support and Computer Programming Technologies</option>
+                <?php
+                $strengthened_strands = array_filter(array_map('trim', explode("\n", $settings['strengthened_strands'] ?? "Industrial Technologies\nHospitality and Tourism\nICT Support and Computer Programming Technologies")));
+                foreach ($strengthened_strands as $strand): ?>
+                  <option value="<?= htmlspecialchars($strand) ?>" <?= set_value('strengthened_strand', $row['strengthened_strand'] ?? '') === $strand ? 'selected' : '' ?>><?= htmlspecialchars($strand) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
             <div class="col-12">
-              <label class="form-label">Specializations</label>
-              <textarea name="strengthened_specializations" class="form-control" rows="3"><?= htmlspecialchars(set_value('strengthened_specializations', $row['strengthened_specializations'] ?? '')) ?></textarea>
+              <label class="form-label">Specializations *</label>
+              <div id="strengthened_specializations_container" class="border p-3 rounded bg-light" style="min-height: 60px;">
+                <small class="text-muted">Select a strand first to see available specializations.</small>
+              </div>
+              <input type="hidden" name="strengthened_specializations" id="strengthened_specializations_input" value="<?= htmlspecialchars(set_value('strengthened_specializations', $row['strengthened_specializations'] ?? '')) ?>">
             </div>
           </div>
         </div>
@@ -133,3 +151,73 @@
     </form>
   </div>
 </div>
+
+<script>
+<?php
+$current_specs_json = $settings['current_specializations'] ?? '{}';
+$strengthened_specs_json = $settings['strengthened_specializations'] ?? '{}';
+?>
+
+const currentSpecializations = <?= $current_specs_json ?>;
+const strengthenedSpecializations = <?= $strengthened_specs_json ?>;
+
+function renderSpecializations(strand, containerId, inputId, specsMap) {
+  const container = document.getElementById(containerId);
+  const input = document.getElementById(inputId);
+  const currentValue = input.value ? input.value.split(',').map(s => s.trim()) : [];
+
+  if (!strand || !specsMap[strand]) {
+    container.innerHTML = '<small class="text-muted">Select a strand first to see available specializations.</small>';
+    input.value = '';
+    return;
+  }
+
+  const specs = specsMap[strand];
+  let html = '<div class="row">';
+  specs.forEach((spec, index) => {
+    const checked = currentValue.includes(spec) ? 'checked' : '';
+    html += `
+      <div class="col-md-6 mb-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="${inputId}_check" value="${spec}" id="${inputId}_${index}" ${checked} onchange="updateSpecializations('${inputId}')">
+          <label class="form-check-label" for="${inputId}_${index}">${spec}</label>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+  updateSpecializations(inputId);
+}
+
+function updateSpecializations(inputId) {
+  const checkboxes = document.querySelectorAll(`input[name="${inputId}_check"]:checked`);
+  const values = Array.from(checkboxes).map(cb => cb.value);
+  document.getElementById(inputId).value = values.join(', ');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const currentStrand = document.querySelector('select[name="current_strand"]');
+  const strengthenedStrand = document.querySelector('select[name="strengthened_strand"]');
+
+  if (currentStrand) {
+    currentStrand.addEventListener('change', function() {
+      renderSpecializations(this.value, 'current_specializations_container', 'current_specializations_input', currentSpecializations);
+    });
+    // Trigger on load if editing
+    if (currentStrand.value) {
+      renderSpecializations(currentStrand.value, 'current_specializations_container', 'current_specializations_input', currentSpecializations);
+    }
+  }
+
+  if (strengthenedStrand) {
+    strengthenedStrand.addEventListener('change', function() {
+      renderSpecializations(this.value, 'strengthened_specializations_container', 'strengthened_specializations_input', strengthenedSpecializations);
+    });
+    // Trigger on load if editing
+    if (strengthenedStrand.value) {
+      renderSpecializations(strengthenedStrand.value, 'strengthened_specializations_container', 'strengthened_specializations_input', strengthenedSpecializations);
+    }
+  }
+});
+</script>

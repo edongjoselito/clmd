@@ -36,8 +36,8 @@
         <i class="bi bi-check2-circle"></i> Approve
       </button>
       <button type="submit" name="action" value="revise" class="btn btn-primary"
-              onclick="return confirm('Return for revision?');">
-        <i class="bi bi-arrow-counterclockwise"></i> Return for Revision
+              onclick="return confirm('Return for compliance?');">
+        <i class="bi bi-arrow-counterclockwise"></i> Return for Compliance
       </button>
       <button type="submit" name="action" value="reject" class="btn btn-danger"
               onclick="return confirm('Reject this document?');">

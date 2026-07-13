@@ -48,7 +48,7 @@ $badges = ['For Approval'=>'warning','Approved'=>'success','Rejected'=>'danger',
               </td>
               <td>
                 <span class="badge bg-<?= $badges[$doc['status']] ?? 'secondary' ?> rounded-pill">
-                  <?= htmlspecialchars($doc['status']) ?>
+                  <?= $doc['status'] === 'Revised' ? 'For Compliance' : htmlspecialchars($doc['status']) ?>
                 </span>
               </td>
               <td><?= date('M d, Y', strtotime($doc['created_at'])) ?></td>

@@ -196,10 +196,11 @@ class Documents extends MY_Controller
         }
 
         $this->render('documents/form', [
-            'row'     => $row,
-            'pair'    => $pair,
-            'is_edit' => $is_edit,
-            'schools' => $this->School_model->for_dropdown($this->current_user['division_id']),
+            'row'       => $row,
+            'pair'      => $pair,
+            'is_edit'   => $is_edit,
+            'schools'   => $this->School_model->for_dropdown($this->current_user['division_id']),
+            'settings'  => $this->Setting_model->get(),
         ], $is_edit ? 'Edit Division Endorsement' : 'Division Endorsement');
     }
 

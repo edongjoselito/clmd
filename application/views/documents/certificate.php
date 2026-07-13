@@ -148,6 +148,11 @@
     </div>
   </div>
 
+  <?php if (!empty($settings['footer_path']) && file_exists(FCPATH.$settings['footer_path'])): ?>
+  <div class="footer-image">
+    <img src="<?= base_url($settings['footer_path']) ?>" alt="Footer" style="width:100%; height:auto; max-height:80px; object-fit:contain;">
+  </div>
+  <?php else: ?>
   <div class="footer">
     <div>
       <div><strong>Verify authenticity:</strong></div>
@@ -162,6 +167,7 @@
       <div class="verify-text">Scan to verify</div>
     </div>
   </div>
+  <?php endif; ?>
 </div>
 
 </body>

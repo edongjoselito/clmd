@@ -22,8 +22,8 @@ $badges = ['For Approval'=>'warning','Approved'=>'success','Rejected'=>'danger',
       <label class="form-label small mb-1">Status</label>
       <select name="status" class="form-select form-select-sm">
         <option value="">All</option>
-        <?php foreach (['For Approval','Approved','Rejected','Revised'] as $s): ?>
-          <option value="<?= $s ?>" <?= ($filters['status'] ?? '') === $s ? 'selected':'' ?>><?= $s ?></option>
+        <?php foreach (['For Approval'=>'For Approval','Approved'=>'Approved','Rejected'=>'Rejected','Revised'=>'For Compliance'] as $value => $label): ?>
+          <option value="<?= $value ?>" <?= ($filters['status'] ?? '') === $value ? 'selected':'' ?>><?= $label ?></option>
         <?php endforeach; ?>
       </select>
     </div>
@@ -82,7 +82,7 @@ $badges = ['For Approval'=>'warning','Approved'=>'success','Rejected'=>'danger',
             <td>
               <?php foreach ($status_summary as $status => $count): ?>
                 <span class="badge bg-<?= $badges[$status] ?? 'secondary' ?> px-2 py-1 rounded-pill me-1">
-                  <?= htmlspecialchars($status) ?> (<?= $count ?>)
+                  <?= $status === 'Revised' ? 'For Compliance' : htmlspecialchars($status) ?> (<?= $count ?>)
                 </span>
               <?php endforeach; ?>
             </td>
