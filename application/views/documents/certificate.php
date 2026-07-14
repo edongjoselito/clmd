@@ -28,9 +28,11 @@
   .signatory .sigline { display: inline-block; min-width: 300px; border-bottom: 1px solid #222; padding-bottom: 4px; }
   .signatory img.esig { max-height: 70px; display: block; margin: 0 auto -8px; }
   .signatory .name { font-weight: bold; text-transform: uppercase; }
-  .footer { position: absolute; bottom: 14mm; left: 18mm; right: 18mm;
+  .footer { position: absolute; bottom: 12.7mm; left: 18mm; right: 18mm;
             display: flex; justify-content: space-between; align-items: flex-end;
             font-size: 11px; color:#555; }
+  .footer-image { position: absolute; bottom: 12.7mm; left: 18mm; right: 18mm; text-align: center; }
+  .footer-image img { width: 100%; height: auto; max-height: 22mm; object-fit: contain; }
   .qr { text-align: center; }
   .qr img { width: 110px; height: 110px; }
   .verify-text { font-size: 10px; }
@@ -150,7 +152,7 @@
 
   <?php if (!empty($settings['footer_path']) && file_exists(FCPATH.$settings['footer_path'])): ?>
   <div class="footer-image">
-    <img src="<?= base_url($settings['footer_path']) ?>" alt="Footer" style="width:100%; height:auto; max-height:80px; object-fit:contain;">
+    <img src="<?= base_url($settings['footer_path']) ?>" alt="Footer">
   </div>
   <?php else: ?>
   <div class="footer">
