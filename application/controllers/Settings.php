@@ -81,6 +81,25 @@ class Settings extends MY_Controller
                 }
             }
 
+            // Handle initials signature upload
+            if (!empty($_FILES['initials_signature']['name'])) {
+                $upload_dir = FCPATH . 'uploads/initials/';
+                if (!is_dir($upload_dir)) @mkdir($upload_dir, 0775, true);
+                $config = [
+                    'upload_path'   => $upload_dir,
+                    'allowed_types' => 'jpg|jpeg|png',
+                    'max_size'      => 5120,
+                    'encrypt_name'  => TRUE,
+                ];
+                $this->load->library('upload', $config);
+                if ($this->upload->do_upload('initials_signature')) {
+                    $info = $this->upload->data();
+                    $payload['initials_signature_path'] = 'uploads/initials/' . $info['file_name'];
+                } else {
+                    $this->session->set_flashdata('error', $this->upload->display_errors('', ''));
+                }
+            }
+
             $this->Setting_model->update($payload);
             $this->session->set_flashdata('success', 'Settings updated.');
             redirect('settings');

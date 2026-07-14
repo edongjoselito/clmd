@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <title>Certification - <?= htmlspecialchars($cert['control_no']) ?></title>
 <style>
-  @page { size: A4; margin: 3mm 8mm 20mm 8mm; }
+  @page { size: A4; margin: 3mm 8mm 0 8mm; }
   * { box-sizing: border-box; }
   body { font-family: 'Times New Roman', Times, serif; color:#222; margin:0; padding:0; background:#fff; }
-  .page { width: 210mm; min-height: 297mm; padding: 16mm 8mm; margin: 0 auto; background:#fff; position:relative; }
+  .page { width: 210mm; min-height: 297mm; padding: 16mm 8mm 12.7mm 8mm; margin: 0 auto; background:#fff; position:relative; }
   .letterhead { text-align:center; padding-bottom: 8px; }
   .letterhead .small-text { font-size: 12px; }
   .letterhead h2 { margin: 4px 0; color:#0a3d62; letter-spacing: 1px; }
-  .control-no { position: absolute; top: 16mm; right: 8mm; font-size: 11px; color:#555; text-align:right; }
+  .control-no { position: absolute; bottom: 35mm; left: 18mm; font-size: 11px; color:#555; text-align:left; }
   .title { text-align:center; margin-top: 32px; letter-spacing: 4px; font-size: 22px; font-weight: bold; color:#0a3d62; }
   .subtitle { text-align:center; font-style: italic; color:#555; margin-bottom: 22px; }
   .body-text { font-size: 13.5px; line-height: 1.75; text-align: justify; padding: 0 12px; }
@@ -25,17 +25,19 @@
   .curriculum-table td ul { margin: 0; padding-left: 18px; }
   .curriculum-table td li { margin-bottom: 3px; }
   .signatory { margin-top: 50px; text-align: center; }
+  .signatory .sig-area { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: -8px; }
+  .signatory img.esig { max-height: 70px; }
+  .signatory img.initials-sig { max-height: 35px; width: auto; }
   .signatory .sigline { display: inline-block; min-width: 300px; border-bottom: 1px solid #222; padding-bottom: 4px; }
-  .signatory img.esig { max-height: 70px; display: block; margin: 0 auto -8px; }
   .signatory .name { font-weight: bold; text-transform: uppercase; }
-  .footer { position: absolute; bottom: 12.7mm; left: 18mm; right: 18mm;
+  .footer { position: absolute; bottom: 0; left: 18mm; right: 18mm;
             display: flex; justify-content: space-between; align-items: flex-end;
             font-size: 11px; color:#555; }
-  .footer-image { position: absolute; bottom: 12.7mm; left: 18mm; right: 18mm; text-align: center; }
+  .footer-image { position: absolute; bottom: 0; left: 18mm; right: 18mm; text-align: center; }
   .footer-image img { width: 100%; height: auto; max-height: 22mm; object-fit: contain; }
-  .qr { text-align: center; }
-  .qr img { width: 110px; height: 110px; }
-  .verify-text { font-size: 10px; }
+  .qr-container { position: absolute; bottom: 35mm; right: 18mm; text-align: center; }
+  .qr img { width: 80px; height: 80px; }
+  .verify-text { font-size: 9px; color: #555; margin-top: 4px; }
   .actions { text-align:center; margin: 12px 0; }
   .actions button { padding: 8px 18px; font-size: 14px; cursor:pointer; }
   @media print { .actions { display:none; } body { background:#fff; } }
@@ -49,12 +51,8 @@
 </div>
 
 <div class="page">
-  <div class="control-no">
-    Control No.:<br><strong><?= htmlspecialchars($cert['control_no']) ?></strong>
-  </div>
-
   <div class="letterhead">
-    <?php if (!empty($settings['letterhead_path']) && file_exists(FCPATH.$settings['letterhead_path'])): ?>
+    <?php if (!empty($settings['letterhead_path'])): ?>
       <img src="<?= base_url($settings['letterhead_path']) ?>" alt="Letterhead" style="width:100%; height:auto;">
     <?php else: ?>
       <div class="small-text">Republic of the Philippines</div>
@@ -141,16 +139,30 @@
   </div>
 
   <div class="signatory">
-    <?php if (!empty($settings['signature_path']) && file_exists(FCPATH.$settings['signature_path'])): ?>
-      <img class="esig" src="<?= base_url($settings['signature_path']) ?>" alt="e-signature">
-    <?php endif; ?>
+    <div class="sig-area">
+      <?php if (!empty($settings['signature_path'])): ?>
+        <img class="esig" src="<?= base_url($settings['signature_path']) ?>" alt="e-signature">
+      <?php endif; ?>
+      <?php if (!empty($settings['initials_signature_path'])): ?>
+        <img class="initials-sig" src="<?= base_url($settings['initials_signature_path']) ?>" alt="initials">
+      <?php endif; ?>
+    </div>
     <div class="sigline">
       <div class="name"><?= htmlspecialchars($settings['chief_name'] ?: 'CLMD Chief') ?></div>
       <div><?= htmlspecialchars($settings['chief_position'] ?: 'Chief Education Supervisor, CLMD') ?></div>
     </div>
   </div>
 
-  <?php if (!empty($settings['footer_path']) && file_exists(FCPATH.$settings['footer_path'])): ?>
+  <div class="control-no">
+    Control No.:<br><strong><?= htmlspecialchars($cert['control_no']) ?></strong>
+  </div>
+
+  <div class="qr-container">
+    <img src="<?= htmlspecialchars($qr_url) ?>" alt="QR Code">
+    <div class="verify-text">Scan to verify authenticity</div>
+  </div>
+
+  <?php if (!empty($settings['footer_path'])): ?>
   <div class="footer-image">
     <img src="<?= base_url($settings['footer_path']) ?>" alt="Footer">
   </div>
@@ -163,10 +175,6 @@
         Approved: Certification <?= date('M d, Y', strtotime($cert['approved_at'] ?: $cert['reviewed_at'])) ?>
         &middot; Endorsement <?= date('M d, Y', strtotime($endorse['approved_at'] ?: $endorse['reviewed_at'])) ?>
       </div>
-    </div>
-    <div class="qr">
-      <img src="<?= htmlspecialchars($qr_url) ?>" alt="QR Code">
-      <div class="verify-text">Scan to verify</div>
     </div>
   </div>
   <?php endif; ?>

@@ -14,7 +14,33 @@
           <input type="text" name="chief_position" class="form-control"
                  value="<?= htmlspecialchars($settings['chief_position'] ?? '') ?>">
         </div>
-        <div class="col-md-4">
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">e-Signature Image (PNG/JPG, transparent PNG recommended)</label>
+          <input type="file" name="signature" class="form-control" accept="image/png,image/jpeg">
+          <?php if (!empty($settings['signature_path'])): ?>
+            <div class="mt-2 p-2 border rounded bg-white">
+              <small class="text-muted">Current:</small><br>
+              <img src="<?= base_url($settings['signature_path']) ?>" style="max-height:80px;">
+            </div>
+          <?php endif; ?>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Initials Signature Image (PNG/JPG, small signature for initials)</label>
+          <input type="file" name="initials_signature" class="form-control" accept="image/png,image/jpeg">
+          <?php if (!empty($settings['initials_signature_path'])): ?>
+            <div class="mt-2 p-2 border rounded bg-white">
+              <small class="text-muted">Current:</small><br>
+              <img src="<?= base_url($settings['initials_signature_path']) ?>" style="max-height:40px;">
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-12">
           <label class="form-label">Letterhead Image (PNG/JPG)</label>
           <input type="file" name="letterhead" class="form-control" accept="image/png,image/jpeg">
           <?php if (!empty($settings['letterhead_path'])): ?>
@@ -24,23 +50,16 @@
             </div>
           <?php endif; ?>
         </div>
-        <div class="col-md-4">
+      </div>
+
+      <div class="row g-3">
+        <div class="col-12">
           <label class="form-label">Footer Image (PNG/JPG)</label>
           <input type="file" name="footer" class="form-control" accept="image/png,image/jpeg">
           <?php if (!empty($settings['footer_path'])): ?>
             <div class="mt-2 p-2 border rounded bg-white">
               <small class="text-muted">Current:</small><br>
               <img src="<?= base_url($settings['footer_path']) ?>" style="max-height:80px;">
-            </div>
-          <?php endif; ?>
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">e-Signature Image (PNG/JPG, transparent PNG recommended)</label>
-          <input type="file" name="signature" class="form-control" accept="image/png,image/jpeg">
-          <?php if (!empty($settings['signature_path'])): ?>
-            <div class="mt-2 p-2 border rounded bg-white">
-              <small class="text-muted">Current:</small><br>
-              <img src="<?= base_url($settings['signature_path']) ?>" style="max-height:80px;">
             </div>
           <?php endif; ?>
         </div>

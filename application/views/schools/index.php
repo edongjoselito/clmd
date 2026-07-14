@@ -1,5 +1,10 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h5 class="mb-0">Schools</h5>
+  <div>
+    <h5 class="mb-0">Schools</h5>
+    <?php if (!empty($division_name)): ?>
+      <small class="text-muted"><?= htmlspecialchars($division_name) ?></small>
+    <?php endif; ?>
+  </div>
   <?php if ($_user['role'] === 'division'): ?>
     <a href="<?= site_url('schools/create') ?>" class="btn btn-primary btn-sm">
       <i class="bi bi-plus-lg"></i> New School
@@ -31,7 +36,7 @@
           <?php foreach ($divisions as $d): ?>
             <option value="<?= $d['division_id'] ?>"
               <?= (int)($filters['division_id'] ?? 0) === (int)$d['division_id'] ? 'selected':'' ?>>
-              <?= htmlspecialchars($d['code']) ?>
+              <?= htmlspecialchars($d['name']) ?>
             </option>
           <?php endforeach; ?>
         </select>
@@ -55,7 +60,6 @@
             <th>Type</th>
             <th>Email</th>
             <th>Address</th>
-            <?php if ($_user['role'] === 'regional'): ?><th>Division</th><?php endif; ?>
             <th>Status</th>
             <?php if ($_user['role'] === 'division'): ?><th class="text-end">Actions</th><?php endif; ?>
           </tr>
@@ -77,9 +81,6 @@
                   echo $parts ? htmlspecialchars(implode(', ', $parts)) : '—';
                 ?>
               </td>
-              <?php if ($_user['role'] === 'regional'): ?>
-                <td><?= htmlspecialchars($r['division_code'] ?? '—') ?></td>
-              <?php endif; ?>
               <td>
                 <?php if ((int)$r['is_active'] === 1): ?>
                   <span class="badge bg-success">Active</span>

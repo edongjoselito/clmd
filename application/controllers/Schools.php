@@ -44,17 +44,24 @@ class Schools extends MY_Controller
             'search'      => $this->input->get('q', TRUE) ?: null,
         ];
 
+        $division_name = null;
+
         // Division users only see their division's schools
         if ($this->current_user['role'] === 'division') {
             $filters['division_id'] = $this->current_user['division_id'];
+            $division = $this->Division_model->get($this->current_user['division_id']);
+            $division_name = $division ? $division['name'] : null;
         } elseif ($div = $this->input->get('division_id', TRUE)) {
             $filters['division_id'] = $div;
+            $division = $this->Division_model->get($div);
+            $division_name = $division ? $division['name'] : null;
         }
 
         $this->render('schools/index', [
-            'rows'      => $this->School_model->all($filters),
-            'divisions' => $this->Division_model->all(),
-            'filters'   => $filters,
+            'rows'          => $this->School_model->all($filters),
+            'divisions'     => $this->Division_model->all(),
+            'filters'       => $filters,
+            'division_name' => $division_name,
         ], 'Schools');
     }
 
