@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 14, 2026 at 02:34 AM
+-- Generation Time: Jul 15, 2026 at 11:48 PM
 -- Server version: 8.4.7
 -- PHP Version: 8.2.4
 
@@ -60,7 +60,8 @@ INSERT INTO `activity_logs` (`log_id`, `user_id`, `action`, `details`, `ip_addre
 (28, 2, 'document_submit', 'Cert #14', '127.0.0.1', '2026-07-13 11:13:15'),
 (29, 2, 'document_submit', 'Endorse #15', '127.0.0.1', '2026-07-13 11:13:15'),
 (30, 1, 'document_review', 'Doc #14 -> Approved', '127.0.0.1', '2026-07-13 11:15:30'),
-(31, 1, 'document_review', 'Doc #15 -> Approved', '127.0.0.1', '2026-07-13 11:16:02');
+(31, 1, 'document_review', 'Doc #15 -> Approved', '127.0.0.1', '2026-07-13 11:16:02'),
+(32, 1, 'user_update', 'Updated user clmd@region11.deped.gov.ph', '127.0.0.1', '2026-07-15 08:56:02');
 
 -- --------------------------------------------------------
 
@@ -159,10 +160,7 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`notif_id`, `user_id`, `title`, `message`, `link_url`, `is_read`, `created_at`) VALUES
-(25, 1, 'New Documents for Approval', 'Chiko Bolero submitted Certification & Endorsement for Cora Tan NHS', 'http://localhost/clmd/index.php/documents', 0, '2026-07-13 11:13:15'),
-(26, 2, 'Document Approved', 'Certification of Compliance (Cora Tan NHS)', 'http://localhost/clmd/index.php/documents/view/14', 0, '2026-07-13 11:15:30'),
-(27, 2, 'Document Approved', 'Endorsement (Cora Tan NHS)', 'http://localhost/clmd/index.php/documents/view/15', 0, '2026-07-13 11:16:02'),
-(28, 2, 'Certification Ready to Print', 'Both documents for Cora Tan NHS are now Approved. You may print the combined Certification.', 'http://localhost/clmd/index.php/documents/certificate/5', 0, '2026-07-13 11:16:02');
+(25, 1, 'New Documents for Approval', 'Chiko Bolero submitted Certification & Endorsement for Cora Tan NHS', 'http://localhost/clmd/index.php/documents', 0, '2026-07-13 11:13:15');
 
 -- --------------------------------------------------------
 
@@ -42246,8 +42244,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `full_name`, `email`, `role`, `division_id`, `position`, `is_active`, `last_login`, `created_at`) VALUES
-(1, 'admin', '$2y$10$ijH2lc8xdKzSyhi0qtGla.5Va0lsY8/Wv3lkoJs2AsO9apWvT83KS', 'CLMD Regional Administrator', 'clmd@region11.deped.gov.ph', 'regional', NULL, 'CLMD Chief', 1, '2026-07-14 08:14:52', '2026-05-15 15:54:37'),
-(2, 'chiko@deped.gov.ph', '$2y$10$CRwn8m6kfYa0ZdwwRvaHx.YKh2yH.vcWqdfOuho7BEQ2evbH0iX96', 'Chiko Bolero', 'chiko@deped.gov.ph', 'division', 3, 'Division Focal Person', 1, '2026-07-14 08:06:45', '2026-05-15 16:07:56'),
+(1, 'clmd@region11.deped.gov.ph', '$2y$10$ijH2lc8xdKzSyhi0qtGla.5Va0lsY8/Wv3lkoJs2AsO9apWvT83KS', 'Chiko Bolero', 'clmd@region11.deped.gov.ph', 'regional', NULL, 'aaa', 1, '2026-07-16 05:07:57', '2026-05-15 15:54:37'),
+(2, 'chiko@deped.gov.ph', '$2y$10$CRwn8m6kfYa0ZdwwRvaHx.YKh2yH.vcWqdfOuho7BEQ2evbH0iX96', 'Chiko Bolero', 'chiko@deped.gov.ph', 'division', 3, 'Division Focal Person', 1, '2026-07-16 05:37:23', '2026-05-15 16:07:56'),
 (3, 'norman.tomas@deped.gov.ph', '$2y$10$WU1q5K8fatExAWvNB4/oR.ZyyU0vL3pvkgHury440U8Q.gwct0c/K', 'Norman Tomas', 'norman.tomas@deped.gov.ph', 'division', 3, NULL, 1, '2026-05-16 19:30:25', '2026-05-16 11:30:18');
 
 --
@@ -42323,7 +42321,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `log_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `log_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `divisions`
