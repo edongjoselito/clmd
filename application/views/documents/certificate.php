@@ -6,7 +6,7 @@
 <style>
   @page { size: A4; margin: 3mm 8mm 0 8mm; }
   * { box-sizing: border-box; }
-  body { font-family: 'Times New Roman', Times, serif; color:#222; margin:0; padding:0; background:#fff; }
+  body { font-family: 'Calibri', Arial, sans-serif; color:#222; margin:0; padding:0; background:#fff; }
   .page { width: 210mm; min-height: 297mm; padding: 16mm 8mm 12.7mm 8mm; margin: 0 auto; background:#fff; position:relative; }
   .letterhead { text-align:center; padding-bottom: 8px; }
   .letterhead .small-text { font-size: 12px; }
@@ -36,7 +36,7 @@
   .footer-image { position: absolute; bottom: 0; left: 18mm; right: 18mm; text-align: center; }
   .footer-image img { width: 100%; height: auto; max-height: 22mm; object-fit: contain; }
   .qr-container { position: absolute; bottom: 35mm; right: 18mm; text-align: center; }
-  .qr img { width: 80px; height: 80px; }
+  .qr img { width: 35px; height: 35px; }
   .verify-text { font-size: 9px; color: #555; margin-top: 4px; }
   .actions { text-align:center; margin: 12px 0; }
   .actions button { padding: 8px 18px; font-size: 14px; cursor:pointer; }

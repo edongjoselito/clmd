@@ -28,8 +28,8 @@
   <div class="brand-bar"></div>
   <div class="login-header text-center">
     <i class="bi bi-mortarboard-fill" style="font-size:2.5rem; color:#0a3d62;"></i>
-    <h4 class="mt-2">CLMD - DepEd Region XI</h4>
-    <small>Curriculum &amp; Learning Management Division</small>
+    <h4 class="mt-2">DepEd XI CLMD SELECTS <i class="bi bi-info-circle" style="font-size:0.8rem; cursor:pointer;" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="R XI-SELECTS (Region XI – Specialization Evaluation, Localization, E-Certification, and Tracking System) is a comprehensive digital platform designed to streamline the evaluation, localization, certification, and monitoring of specialization programs across DepEd Region XI."></i></h4>
+    <small>Ensuring Compliance. Expanding Access. Inspiring Excellence.</small>
   </div>
   <div class="login-body">
     <?php if (!empty($error)): ?>
@@ -38,7 +38,7 @@
     <form method="post" action="<?= site_url('login') ?>" autocomplete="off">
       <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
       <div class="mb-3">
-        <label class="form-label">Username / Email</label>
+        <label class="form-label">Email</label>
         <input type="text" name="username" class="form-control" required
                value="<?= htmlspecialchars($username) ?>" autofocus>
       </div>
@@ -55,5 +55,12 @@
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const tooltipTriggerElement = document.querySelector('[data-bs-toggle="tooltip"]');
+  if (tooltipTriggerElement) {
+    new bootstrap.Tooltip(tooltipTriggerElement);
+  }
+</script>
 </body>
 </html>
