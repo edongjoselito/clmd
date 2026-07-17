@@ -13,9 +13,14 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Prevent access to application and system directories
+# Prevent access to application/system code and to uploaded documents (PDFs).
+# NOTE: image folders under uploads/ (letterhead, signature, initials, footer)
+# must stay publicly readable because the certificate view links them directly.
+# Match the path segment anywhere so this works whether the app is mounted at the
+# domain root (/uploads/...) or in a subfolder (/clmd/uploads/...).
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{REQUEST_URI} ^/(application|system|uploads)/
+    RewriteCond %{REQUEST_URI} (^|/)(application|system)/ [OR]
+    RewriteCond %{REQUEST_URI} (^|/)uploads/documents/
     RewriteRule ^(.*)$ - [F,L]
 </IfModule>
