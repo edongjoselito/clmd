@@ -76,6 +76,21 @@
     };
     $current_specs    = $parse_specs($cert['current_specializations']);
     $strengthened_specs = $parse_specs($cert['strengthened_specializations']);
+    $current_strands = $parse_specs($cert['current_strand']);
+    $strengthened_strands = $parse_specs($cert['strengthened_strand']);
+    if (empty($current_strands)) $current_strands = ['—'];
+    if (empty($strengthened_strands)) $strengthened_strands = ['—'];
+    $map_specs_to_strands = function ($selected_specs, $strands, $settings_json) {
+        $configured_specs = json_decode($settings_json ?: '{}', true);
+        $mapped_specs = [];
+        foreach ($strands as $strand) {
+            $available_specs = is_array($configured_specs[$strand] ?? null) ? $configured_specs[$strand] : [];
+            $mapped_specs[$strand] = array_values(array_intersect($selected_specs, $available_specs));
+        }
+        return $mapped_specs;
+    };
+    $current_specs_by_strand = $map_specs_to_strands($current_specs, $current_strands, $settings['current_specializations'] ?? '{}');
+    $strengthened_specs_by_strand = $map_specs_to_strands($strengthened_specs, $strengthened_strands, $settings['strengthened_specializations'] ?? '{}');
   ?>
 
   <div class="body-text">
@@ -91,13 +106,16 @@
         </tr>
       </thead>
       <tbody>
+        <?php foreach ($current_strands as $index => $strand): ?>
         <tr>
-          <td><?= htmlspecialchars($cert['current_track']) ?></td>
-          <td><?= htmlspecialchars($cert['current_strand']) ?></td>
+          <?php if ($index === 0): ?>
+            <td rowspan="<?= count($current_strands) ?>"><?= htmlspecialchars($cert['current_track']) ?></td>
+          <?php endif; ?>
+          <td><?= htmlspecialchars($strand) ?></td>
           <td>
-            <?php if (!empty($current_specs)): ?>
+            <?php if (!empty($current_specs_by_strand[$strand])): ?>
               <ul>
-                <?php foreach ($current_specs as $spec): ?>
+                <?php foreach ($current_specs_by_strand[$strand] as $spec): ?>
                   <li><?= htmlspecialchars($spec) ?></li>
                 <?php endforeach; ?>
               </ul>
@@ -106,6 +124,7 @@
             <?php endif; ?>
           </td>
         </tr>
+        <?php endforeach; ?>
       </tbody>
     </table>
 
@@ -119,13 +138,16 @@
         </tr>
       </thead>
       <tbody>
+        <?php foreach ($strengthened_strands as $index => $strand): ?>
         <tr>
-          <td><?= htmlspecialchars($cert['strengthened_track']) ?></td>
-          <td><?= htmlspecialchars($cert['strengthened_strand']) ?></td>
+          <?php if ($index === 0): ?>
+            <td rowspan="<?= count($strengthened_strands) ?>"><?= htmlspecialchars($cert['strengthened_track']) ?></td>
+          <?php endif; ?>
+          <td><?= htmlspecialchars($strand) ?></td>
           <td>
-            <?php if (!empty($strengthened_specs)): ?>
+            <?php if (!empty($strengthened_specs_by_strand[$strand])): ?>
               <ul>
-                <?php foreach ($strengthened_specs as $spec): ?>
+                <?php foreach ($strengthened_specs_by_strand[$strand] as $spec): ?>
                   <li><?= htmlspecialchars($spec) ?></li>
                 <?php endforeach; ?>
               </ul>
@@ -134,6 +156,7 @@
             <?php endif; ?>
           </td>
         </tr>
+        <?php endforeach; ?>
       </tbody>
     </table>
   </div>

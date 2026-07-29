@@ -76,6 +76,11 @@ class Documents extends MY_Controller
         $pair = $is_edit ? $this->Document_model->get_pair($row['school_id']) : null;
 
         if ($this->input->method() === 'post') {
+            $current_strand = implode(', ', array_filter(array_map('trim', array_filter((array)$this->input->post('current_strand_values', TRUE), 'is_string'))));
+            $strengthened_strand = implode(', ', array_filter(array_map('trim', array_filter((array)$this->input->post('strengthened_strand_values', TRUE), 'is_string'))));
+            $_POST['current_strand'] = $current_strand;
+            $_POST['strengthened_strand'] = $strengthened_strand;
+
             $this->form_validation->set_rules('school_id', 'School', 'required|integer');
             $this->form_validation->set_rules('current_track', 'Current Track', 'required|max_length[100]');
             $this->form_validation->set_rules('current_strand', 'Current Strand', 'required|max_length[100]');
@@ -109,10 +114,10 @@ class Documents extends MY_Controller
                         'file_path'                  => $cert_fp,
                         'remarks'                    => null,
                         'current_track'              => $this->input->post('current_track', TRUE),
-                        'current_strand'             => $this->input->post('current_strand', TRUE),
+                        'current_strand'             => $current_strand,
                         'current_specializations'    => $this->input->post('current_specializations', TRUE) ?: null,
                         'strengthened_track'         => $this->input->post('strengthened_track', TRUE),
-                        'strengthened_strand'        => $this->input->post('strengthened_strand', TRUE),
+                        'strengthened_strand'        => $strengthened_strand,
                         'strengthened_specializations' => $this->input->post('strengthened_specializations', TRUE) ?: null,
                         'status'                     => 'For Approval',
                     ];
@@ -129,10 +134,10 @@ class Documents extends MY_Controller
                         'file_path'                  => $endorse_fp,
                         'remarks'                    => null,
                         'current_track'              => $this->input->post('current_track', TRUE),
-                        'current_strand'             => $this->input->post('current_strand', TRUE),
+                        'current_strand'             => $current_strand,
                         'current_specializations'    => $this->input->post('current_specializations', TRUE) ?: null,
                         'strengthened_track'         => $this->input->post('strengthened_track', TRUE),
-                        'strengthened_strand'        => $this->input->post('strengthened_strand', TRUE),
+                        'strengthened_strand'        => $strengthened_strand,
                         'strengthened_specializations' => $this->input->post('strengthened_specializations', TRUE) ?: null,
                         'status'                     => 'For Approval',
                     ];
@@ -155,10 +160,10 @@ class Documents extends MY_Controller
                     // Edit mode: update both certification and endorsement with shared curriculum data
                     $common_payload = [
                         'current_track'              => $this->input->post('current_track', TRUE),
-                        'current_strand'             => $this->input->post('current_strand', TRUE),
+                        'current_strand'             => $current_strand,
                         'current_specializations'    => $this->input->post('current_specializations', TRUE) ?: null,
                         'strengthened_track'         => $this->input->post('strengthened_track', TRUE),
-                        'strengthened_strand'        => $this->input->post('strengthened_strand', TRUE),
+                        'strengthened_strand'        => $strengthened_strand,
                         'strengthened_specializations' => $this->input->post('strengthened_specializations', TRUE) ?: null,
                     ];
 

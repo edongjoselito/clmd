@@ -68,14 +68,21 @@
             </div>
             <div class="col-12">
               <label class="form-label">Strand *</label>
-              <select name="current_strand" class="form-select" required>
-                <option value="">— Select Strand —</option>
-                <?php
-                $current_strands = array_filter(array_map('trim', explode("\n", $settings['current_strands'] ?? "I.A. Strand\nH.E. Strand\nICT Strand")));
-                foreach ($current_strands as $strand): ?>
-                  <option value="<?= htmlspecialchars($strand) ?>" <?= set_value('current_strand', $row['current_strand'] ?? '') === $strand ? 'selected' : '' ?>><?= htmlspecialchars($strand) ?></option>
+              <?php $selected_current_strands = array_filter(array_map('trim', explode(',', set_value('current_strand', $row['current_strand'] ?? '')))); ?>
+              <?php
+              $current_strands_text = trim($settings['current_strands'] ?? '') ?: "I.A. Strand\nH.E. Strand\nICT Strand";
+              $current_strands = array_filter(array_map('trim', explode("\n", $current_strands_text)));
+              ?>
+              <div class="border rounded p-2">
+                <?php foreach ($current_strands as $index => $strand): ?>
+                  <div class="form-check">
+                    <input class="form-check-input current-strand-select" type="checkbox" name="current_strand_values[]" value="<?= htmlspecialchars($strand) ?>" id="current_strand_<?= $index ?>" <?= in_array($strand, $selected_current_strands, true) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="current_strand_<?= $index ?>"><?= htmlspecialchars($strand) ?></label>
+                  </div>
                 <?php endforeach; ?>
-              </select>
+              </div>
+              <input type="hidden" name="current_strand" id="current_strand_input" value="<?= htmlspecialchars(implode(', ', $selected_current_strands)) ?>">
+              <small class="text-muted">Select all applicable strands.</small>
             </div>
             <div class="col-12">
               <label class="form-label">Specializations *</label>
@@ -104,14 +111,21 @@
             </div>
             <div class="col-12">
               <label class="form-label">Strand *</label>
-              <select name="strengthened_strand" class="form-select" required>
-                <option value="">— Select Strand —</option>
-                <?php
-                $strengthened_strands = array_filter(array_map('trim', explode("\n", $settings['strengthened_strands'] ?? "Industrial Technologies\nHospitality and Tourism\nICT Support and Computer Programming Technologies")));
-                foreach ($strengthened_strands as $strand): ?>
-                  <option value="<?= htmlspecialchars($strand) ?>" <?= set_value('strengthened_strand', $row['strengthened_strand'] ?? '') === $strand ? 'selected' : '' ?>><?= htmlspecialchars($strand) ?></option>
+              <?php $selected_strengthened_strands = array_filter(array_map('trim', explode(',', set_value('strengthened_strand', $row['strengthened_strand'] ?? '')))); ?>
+              <?php
+              $strengthened_strands_text = trim($settings['strengthened_strands'] ?? '') ?: "Industrial Technologies\nHospitality and Tourism\nICT Support and Computer Programming Technologies";
+              $strengthened_strands = array_filter(array_map('trim', explode("\n", $strengthened_strands_text)));
+              ?>
+              <div class="border rounded p-2">
+                <?php foreach ($strengthened_strands as $index => $strand): ?>
+                  <div class="form-check">
+                    <input class="form-check-input strengthened-strand-select" type="checkbox" name="strengthened_strand_values[]" value="<?= htmlspecialchars($strand) ?>" id="strengthened_strand_<?= $index ?>" <?= in_array($strand, $selected_strengthened_strands, true) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="strengthened_strand_<?= $index ?>"><?= htmlspecialchars($strand) ?></label>
+                  </div>
                 <?php endforeach; ?>
-              </select>
+              </div>
+              <input type="hidden" name="strengthened_strand" id="strengthened_strand_input" value="<?= htmlspecialchars(implode(', ', $selected_strengthened_strands)) ?>">
+              <small class="text-muted">Select all applicable strands.</small>
             </div>
             <div class="col-12">
               <label class="form-label">Specializations *</label>
@@ -125,6 +139,26 @@
       </div>
 
       <hr>
+      <div class="card border-info mb-4">
+        <div class="card-header bg-info-subtle"><strong>Review Curriculum Selections</strong></div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h6>Current Curriculum</h6>
+              <div><strong>Track:</strong> <span id="review_current_track">Not selected</span></div>
+              <div class="mt-2"><strong>Strands:</strong><ul id="review_current_strands" class="mb-0"></ul></div>
+              <div class="mt-2"><strong>Specializations:</strong><ul id="review_current_specializations" class="mb-0"></ul></div>
+            </div>
+            <div class="col-md-6">
+              <h6>Strengthened Curriculum</h6>
+              <div><strong>Track:</strong> <span id="review_strengthened_track">Not selected</span></div>
+              <div class="mt-2"><strong>Strands:</strong><ul id="review_strengthened_strands" class="mb-0"></ul></div>
+              <div class="mt-2"><strong>Specializations:</strong><ul id="review_strengthened_specializations" class="mb-0"></ul></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <h5 class="mb-3">Attachments</h5>
       <div class="row g-3 mb-4">
         <div class="col-md-6">
@@ -161,18 +195,21 @@ $strengthened_specs_json = $settings['strengthened_specializations'] ?? '{}';
 const currentSpecializations = <?= $current_specs_json ?>;
 const strengthenedSpecializations = <?= $strengthened_specs_json ?>;
 
-function renderSpecializations(strand, containerId, inputId, specsMap) {
+function renderSpecializations(strands, containerId, inputId, specsMap) {
   const container = document.getElementById(containerId);
   const input = document.getElementById(inputId);
   const currentValue = input.value ? input.value.split(',').map(s => s.trim()) : [];
+  const selectedStrands = Array.isArray(strands) ? strands : (strands ? [strands] : []);
+  const specs = [...new Set(selectedStrands.reduce((allSpecs, strand) => {
+    return allSpecs.concat(specsMap[strand] || []);
+  }, []))];
 
-  if (!strand || !specsMap[strand]) {
+  if (!specs.length) {
     container.innerHTML = '<small class="text-muted">Select a strand first to see available specializations.</small>';
     input.value = '';
     return;
   }
 
-  const specs = specsMap[strand];
   let html = '<div class="row">';
   specs.forEach((spec, index) => {
     const checked = currentValue.includes(spec) ? 'checked' : '';
@@ -194,30 +231,82 @@ function updateSpecializations(inputId) {
   const checkboxes = document.querySelectorAll(`input[name="${inputId}_check"]:checked`);
   const values = Array.from(checkboxes).map(cb => cb.value);
   document.getElementById(inputId).value = values.join(', ');
+  updateCurriculumReview();
+}
+
+function setReviewList(id, values) {
+  const list = document.getElementById(id);
+  list.innerHTML = '';
+
+  if (!values.length) {
+    const item = document.createElement('li');
+    item.textContent = 'Not selected';
+    list.appendChild(item);
+    return;
+  }
+
+  values.forEach(value => {
+    const item = document.createElement('li');
+    item.textContent = value;
+    list.appendChild(item);
+  });
+}
+
+function updateCurriculumReview() {
+  const currentTrack = document.querySelector('select[name="current_track"]');
+  const strengthenedTrack = document.querySelector('select[name="strengthened_track"]');
+  const currentStrands = document.querySelectorAll('input[name="current_strand_values[]"]');
+  const strengthenedStrands = document.querySelectorAll('input[name="strengthened_strand_values[]"]');
+
+  document.getElementById('review_current_track').textContent = currentTrack.value || 'Not selected';
+  document.getElementById('review_strengthened_track').textContent = strengthenedTrack.value || 'Not selected';
+  setReviewList('review_current_strands', Array.from(currentStrands).filter(input => input.checked).map(input => input.value));
+  setReviewList('review_strengthened_strands', Array.from(strengthenedStrands).filter(input => input.checked).map(input => input.value));
+  setReviewList('review_current_specializations', document.getElementById('current_specializations_input').value.split(',').map(value => value.trim()).filter(Boolean));
+  setReviewList('review_strengthened_specializations', document.getElementById('strengthened_specializations_input').value.split(',').map(value => value.trim()).filter(Boolean));
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  const currentStrand = document.querySelector('select[name="current_strand"]');
-  const strengthenedStrand = document.querySelector('select[name="strengthened_strand"]');
+  const currentStrands = document.querySelectorAll('input[name="current_strand_values[]"]');
+  const strengthenedStrands = document.querySelectorAll('input[name="strengthened_strand_values[]"]');
 
-  if (currentStrand) {
-    currentStrand.addEventListener('change', function() {
-      renderSpecializations(this.value, 'current_specializations_container', 'current_specializations_input', currentSpecializations);
+  function selectedValues(inputs) {
+    return Array.from(inputs).filter(input => input.checked).map(input => input.value);
+  }
+
+  function syncStrands(inputs, inputId) {
+    document.getElementById(inputId).value = selectedValues(inputs).join(', ');
+  }
+
+  document.querySelector('select[name="current_track"]').addEventListener('change', updateCurriculumReview);
+  document.querySelector('select[name="strengthened_track"]').addEventListener('change', updateCurriculumReview);
+
+  if (currentStrands.length) {
+    currentStrands.forEach(function(strand) {
+      strand.addEventListener('change', function() {
+        syncStrands(currentStrands, 'current_strand_input');
+        renderSpecializations(selectedValues(currentStrands), 'current_specializations_container', 'current_specializations_input', currentSpecializations);
+      });
     });
     // Trigger on load if editing
-    if (currentStrand.value) {
-      renderSpecializations(currentStrand.value, 'current_specializations_container', 'current_specializations_input', currentSpecializations);
+    if (selectedValues(currentStrands).length) {
+      renderSpecializations(selectedValues(currentStrands), 'current_specializations_container', 'current_specializations_input', currentSpecializations);
     }
   }
 
-  if (strengthenedStrand) {
-    strengthenedStrand.addEventListener('change', function() {
-      renderSpecializations(this.value, 'strengthened_specializations_container', 'strengthened_specializations_input', strengthenedSpecializations);
+  if (strengthenedStrands.length) {
+    strengthenedStrands.forEach(function(strand) {
+      strand.addEventListener('change', function() {
+        syncStrands(strengthenedStrands, 'strengthened_strand_input');
+        renderSpecializations(selectedValues(strengthenedStrands), 'strengthened_specializations_container', 'strengthened_specializations_input', strengthenedSpecializations);
+      });
     });
     // Trigger on load if editing
-    if (strengthenedStrand.value) {
-      renderSpecializations(strengthenedStrand.value, 'strengthened_specializations_container', 'strengthened_specializations_input', strengthenedSpecializations);
+    if (selectedValues(strengthenedStrands).length) {
+      renderSpecializations(selectedValues(strengthenedStrands), 'strengthened_specializations_container', 'strengthened_specializations_input', strengthenedSpecializations);
     }
   }
+
+  updateCurriculumReview();
 });
 </script>
