@@ -11,7 +11,8 @@
   .letterhead { text-align:center; padding-bottom: 8px; }
   .letterhead .small-text { font-size: 12px; }
   .letterhead h2 { margin: 4px 0; color:#0a3d62; letter-spacing: 1px; }
-  .control-no { position: absolute; bottom: 35mm; left: 18mm; font-size: 11px; color:#555; text-align:left; }
+  .verification-group { display: flex; justify-content: space-between; align-items: center; margin: 14px 18mm 0; }
+  .control-no { font-size: 11px; color:#555; text-align:left; }
   .title { text-align:center; margin-top: 32px; letter-spacing: 4px; font-size: 22px; font-weight: bold; color:#0a3d62; }
   .subtitle { text-align:center; font-style: italic; color:#555; margin-bottom: 22px; }
   .body-text { font-size: 13.5px; line-height: 1.75; text-align: justify; padding: 0 12px; }
@@ -19,7 +20,7 @@
   .doc-list { margin: 14px 24px; font-size: 13.5px; }
   .doc-list li { margin-bottom: 6px; }
   .curriculum-title { font-size: 14px; font-weight: bold; margin: 18px 0 6px 0; color: #0a3d62; }
-  .curriculum-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px; }
+  .curriculum-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px; line-height: 1; }
   .curriculum-table th { background: #0a3d62; color: #fff; padding: 7px 10px; text-align: left; border: 1px solid #0a3d62; }
   .curriculum-table td { border: 1px solid #999; padding: 8px 10px; vertical-align: top; }
   .curriculum-table td ul { margin: 0; padding-left: 18px; }
@@ -35,9 +36,9 @@
             font-size: 11px; color:#555; }
   .footer-image { position: absolute; bottom: 0; left: 18mm; right: 18mm; text-align: center; }
   .footer-image img { width: 100%; height: auto; max-height: 22mm; object-fit: contain; }
-  .qr-container { position: absolute; bottom: 35mm; right: 18mm; text-align: center; }
-  .qr img { width: 35px; height: 35px; }
-  .verify-text { font-size: 9px; color: #555; margin-top: 4px; }
+  .qr-container { width: 58px; text-align: center; }
+  .qr-container img { display: block; width: 45px; height: 45px; margin: 0 auto; }
+  .verify-text { font-size: 8px; color: #555; margin-top: 3px; line-height: 1.2; }
   .actions { text-align:center; margin: 12px 0; }
   .actions button { padding: 8px 18px; font-size: 14px; cursor:pointer; }
   @media print { .actions { display:none; } body { background:#fff; } }
@@ -176,13 +177,14 @@
     </div>
   </div>
 
-  <div class="control-no">
-    Control No.:<br><strong><?= htmlspecialchars($cert['control_no']) ?></strong>
-  </div>
-
-  <div class="qr-container">
-    <img src="<?= htmlspecialchars($qr_url) ?>" alt="QR Code">
-    <div class="verify-text">Scan to verify authenticity</div>
+  <div class="verification-group">
+    <div class="control-no">
+      Control No.:<br><strong><?= htmlspecialchars($cert['control_no']) ?></strong>
+    </div>
+    <div class="qr-container">
+      <img src="<?= htmlspecialchars($qr_url) ?>" alt="QR Code">
+      <div class="verify-text">Scan to verify authenticity</div>
+    </div>
   </div>
 
   <?php if (!empty($settings['footer_path'])): ?>
