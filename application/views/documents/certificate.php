@@ -11,8 +11,8 @@
   .letterhead { text-align:center; padding-bottom: 8px; }
   .letterhead .small-text { font-size: 12px; }
   .letterhead h2 { margin: 4px 0; color:#0a3d62; letter-spacing: 1px; }
-  .verification-group { display: flex; justify-content: space-between; align-items: center; margin: 14px 18mm 0; }
-  .control-no { font-size: 11px; color:#555; text-align:left; }
+  .verification-group { position: absolute; bottom: 35mm; right: 18mm; border: 1px solid #222; padding: 10px 14px; background: #fff; text-align: center; }
+  .qr-container .control-no { font-size: 11px; color:#555; margin-bottom: 6px; }
   .title { text-align:center; margin-top: 32px; letter-spacing: 4px; font-size: 22px; font-weight: bold; color:#0a3d62; }
   .subtitle { text-align:center; font-style: italic; color:#555; margin-bottom: 22px; }
   .body-text { font-size: 13.5px; line-height: 1.75; text-align: justify; padding: 0 12px; }
@@ -28,7 +28,6 @@
   .signatory { margin-top: 50px; text-align: center; }
   .signatory .sig-area { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: -8px; }
   .signatory img.esig { max-height: 70px; }
-  .signatory img.initials-sig { max-height: 35px; width: auto; }
   .signatory .sigline { display: inline-block; min-width: 300px; border-bottom: 1px solid #222; padding-bottom: 4px; }
   .signatory .name { font-weight: bold; text-transform: uppercase; }
   .footer { position: absolute; bottom: 0; left: 18mm; right: 18mm;
@@ -36,8 +35,10 @@
             font-size: 11px; color:#555; }
   .footer-image { position: absolute; bottom: 0; left: 18mm; right: 18mm; text-align: center; }
   .footer-image img { width: 100%; height: auto; max-height: 22mm; object-fit: contain; }
-  .qr-container { width: 58px; text-align: center; }
-  .qr-container img { display: block; width: 45px; height: 45px; margin: 0 auto; }
+  .qr-container { text-align: center; }
+  .qr-container img { display: block; margin: 0 auto; }
+  .qr-container img.qr-code { width: 55px; height: 55px; }
+  .qr-container .initials-sig { max-height: 25px; width: auto; margin-bottom: 3px; }
   .verify-text { font-size: 8px; color: #555; margin-top: 3px; line-height: 1.2; }
   .actions { text-align:center; margin: 12px 0; }
   .actions button { padding: 8px 18px; font-size: 14px; cursor:pointer; }
@@ -129,7 +130,7 @@
       </tbody>
     </table>
 
-    <div class="curriculum-title">Strengthened Curriculum</div>
+    <div class="curriculum-title">Clustered Electives</div>
     <table class="curriculum-table">
       <thead>
         <tr>
@@ -167,9 +168,6 @@
       <?php if (!empty($settings['signature_path'])): ?>
         <img class="esig" src="<?= base_url($settings['signature_path']) ?>" alt="e-signature">
       <?php endif; ?>
-      <?php if (!empty($settings['initials_signature_path'])): ?>
-        <img class="initials-sig" src="<?= base_url($settings['initials_signature_path']) ?>" alt="initials">
-      <?php endif; ?>
     </div>
     <div class="sigline">
       <div class="name"><?= htmlspecialchars($settings['chief_name'] ?: 'CLMD Chief') ?></div>
@@ -178,11 +176,14 @@
   </div>
 
   <div class="verification-group">
-    <div class="control-no">
-      Control No.:<br><strong><?= htmlspecialchars($cert['control_no']) ?></strong>
-    </div>
     <div class="qr-container">
-      <img src="<?= htmlspecialchars($qr_url) ?>" alt="QR Code">
+      <div class="control-no">
+        Control No.:<br><strong><?= htmlspecialchars($cert['control_no']) ?></strong>
+      </div>
+      <?php if (!empty($settings['initials_signature_path'])): ?>
+        <img class="initials-sig" src="<?= base_url($settings['initials_signature_path']) ?>" alt="initials">
+      <?php endif; ?>
+      <img class="qr-code" src="<?= htmlspecialchars($qr_url) ?>" alt="QR Code">
       <div class="verify-text">Scan to verify authenticity</div>
     </div>
   </div>
