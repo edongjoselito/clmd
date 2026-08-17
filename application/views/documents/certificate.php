@@ -28,7 +28,7 @@
   .signatory { margin-top: 50px; text-align: center; }
   .signatory .sig-area { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: -8px; }
   .signatory img.esig { max-height: 70px; }
-  .signatory .sigline { display: inline-block; min-width: 300px; border-bottom: 1px solid #222; padding-bottom: 4px; }
+  .signatory .sigline { display: inline-block; min-width: 300px; padding-bottom: 4px; }
   .signatory .name { font-weight: bold; text-transform: uppercase; }
   .footer { position: absolute; bottom: 0; left: 18mm; right: 18mm;
             display: flex; justify-content: space-between; align-items: flex-end;
